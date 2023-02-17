@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include ('./patials/head') %>
+    <body>
+        <div class="container is-fluid">
+            <div class="columns">
+
+                <div class="column">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Club</th>
+                                <th>Postion</th>
+                                <th>Goals</th>
+                                <th>isCaptain</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% players.forEach(function(player) { %>
+                                <tr>
+                                    <td>
+                                        <figure class="image is-64x64">
+                                            <img src=<%=player.image %> >
+                                        </figure>
+                                    </td>
+                                    <td>
+                                        <%= player.name %>
+                                    </td>
+                                    <td>
+                                        <%= player.club %>
+                                    </td>
+                                    <td>
+                                        <%= player.position %>
+                                    </td>
+                                    <td>
+                                        <%= player.goals %>
+                                    </td>
+                                    <td>
+                                        <%=player.isCaptain===true ? '(C)' : '' %>
+
+                                    </td>
+                                    <td>
+
+                                        <div class="dropdown">
+                                            <div class="dropdown-trigger">
+                                                <button class="button" aria-haspopup="true"
+                                                    aria-controls="dropdown-menu3">
+                                                    <span class="icon ">
+                                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                    </span>
+                                                </button>
+                                            </div>
+                                            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                                <div class="dropdown-content" style="width: 100px">
+                                                    <a class="dropdown-item"
+                                                        href="/players/edit/<%=player.id %>">Edit</a>
+                                                    <a class="dropdown-item" href="/players/delete/<%=player.id %>"
+                                                        onclick="return confirm('Are you sure ???')">Delete</button></a>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+<!-- 
+                <div class="column">
+                    
+                </div> -->
+
+
+            </div>
+        </div>
+    </body>
+    <script>      
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get all "dropdown" elements
+            var dropdowns = Array.prototype.slice.call(document.querySelectorAll('.dropdown'), 0);
+
+            // Loop through all dropdowns and bind click event
+            dropdowns.forEach(function (dropdown) {
+                dropdown.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    dropdown.classList.toggle('is-active');
+                });
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function (event) {
+                closeDropdowns();
+            });
+
+            function closeDropdowns() {
+                dropdowns.forEach(function (dropdown) {
+                    dropdown.classList.remove('is-active');
+                });
+            }
+        });
+    </script>
+
+</html>

@@ -1,0 +1,236 @@
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.2/css/all.css"> -->
+    <script src="https://kit.fontawesome.com/589ebc73ef.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/js/bulma.min.js" integrity="sha512-XSL8md+KzAg/ysd1EBcvzQx+8keNkzJ1pogDe+bJN9P5/RW+5c5v5d6Am++F6fmnt8wpD22fCaC/MP1M48hRtg==" crossorigin="anonymous"></script>
+    <title><%= title %></title>
+</head>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://bulma.io">
+        <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+      </a>
+  
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+  
+    <div id="navbarBasicExample" class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/">
+          Home
+        </a>
+  
+        <a class="navbar-item" href="/players">
+          Player
+        </a>
+        <a class="navbar-item" href="/nations">
+          Nation
+        </a>         
+            <a class="navbar-item" onClick="document.querySelector('#popup').classList.add('is-active')">
+              Create Player         
+            </a>
+              <!-- Popup -->
+              <div id="popup" class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                  <header class="modal-card-head">
+                    <p class="modal-card-title">ADD NEW PLAYER</p>
+                    <button class="delete" aria-label="close" onclick="document.querySelector('#popup').classList.remove('is-active')"></button>
+                  </header>
+                  <section class="modal-card-body">
+                    <form method="post" action="/players">
+                      <div class="field is-horizontal">
+                          <div class="field-label is-normal">
+                              <label class="label">Name</label>
+                          </div>
+                          <div class="field-body">
+                              <div class="field">
+                                  <div class="control">
+                                      <input class="input is-info" name="name" type="text" placeholder="e.g. Messi"
+                                          required>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="field is-horizontal">
+                          <div class="field-label is-normal">
+                              <label class="label">Club</label>
+                          </div>
+                          <div class="field-body">
+                              <div class="field is-narrow">
+                                  <div class="control">
+                                      <div class="select is-fullwidth">
+                                          <select name="club">
+                                              <%for (let club of clubList){ %>
+                                                  <option value="<%= club.name %>">
+                                                      <%= club.name %>
+                                                  </option>
+                                                  <% } %>
+                                          </select>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="field is-horizontal">
+                          <div class="field-label is-normal">
+                              <label class="label">Image</label>
+                          </div>
+                          <div class="field-body">
+                              <div class="field">
+                                  <div class="control">
+                                      <input class="input is-info" name="image" type="text" placeholder="URL of image"
+                                          required>
+                                  </div>
+
+                              </div>
+                          </div>
+                      </div>
+                      <div class="field is-horizontal">
+                          <div class="field-label is-normal">
+                              <label class="label">Position</label>
+                          </div>
+                          <div class="field-body">
+                              <div class="field is-narrow">
+                                  <div class="control">
+                                      <div class="select is-fullwidth">
+                                          <select name="position">
+                                              <%for (let position of positionList){ %>
+                                                  <option value="<%= position.name %>">
+                                                      <%= position.name %>
+                                                  </option>
+                                                  <% } %>
+                                          </select>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="field is-horizontal">
+                          <div class="field-label is-normal">
+                              <label class="label">Goals</label>
+                          </div>
+                          <div class="field-body">
+                              <div class="field">
+                                  <div class="control">
+                                      <input class="input is-info" name="goals" type="number"
+                                          placeholder="Number of goals" required>
+                                  </div>
+
+                              </div>
+                          </div>
+                      </div>
+                      <div class="field is-horizontal">
+                          <div class="field-label is-normal">
+                              <label class="label">isCaptain</label>
+                          </div>
+                          <div class="field-body">
+                              <div class="field">
+                                  <div class="control">
+                                      <label class="checkbox">
+                                          <input type="checkbox" name="isCaptain" value="true">
+                                          Yes, I am a captain
+                                      </label>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="field is-horizontal">
+                          <div class="field-body">
+                              <div class="field">
+                                  <div class="control">
+                                      <button class="button is-primary" type="submit">
+                                          Create
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </form>
+                  </section>                
+                </div>
+              </div>
+            
+            <!-- <a class="navbar-item">
+              Player
+            </a>    -->
+            
+            <a class="navbar-item" onClick="document.querySelector('#popup2').classList.add('is-active')" >
+             Create Nation
+              
+            </a>
+              <!-- Popup -->
+              <div id="popup2" class="modal">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                  <header class="modal-card-head">
+                    <p class="modal-card-title"> ADD NEW NATION</p>
+                    <button class="delete" aria-label="close" onclick="document.querySelector('#popup2').classList.remove('is-active')"></button>
+                  </header>
+                  <section class="modal-card-body">
+                    <form method ="post" action="/nations">
+                      <div class="field is-horizontal">
+                          <div class="field-label is-normal">
+                              <label class="label">Nation</label>
+                          </div>
+                          <div class="field-body">
+                              <div class="field">
+                                  <div class="control">
+                                      <input class="input is-info" required name="name" type="text" placeholder="e.g. Brazil">
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="field is-horizontal">
+                          <div class="field-label is-normal">
+                              <label class="label">Description</label>
+                          </div>
+                          <div class="field-body">
+                              <div class="field">
+                                  <div class="control">
+                                      <input class="input is-info" required name="description" type="text" placeholder="Let's description">
+                                  </div>
+              
+                              </div>
+                          </div>
+                      </div>
+                      
+                      <div class="field is-horizontal">
+                          <div class="field-body">
+                              <div class="field">
+                                  <div class="control">
+                                      <button class="button is-primary" type="submit">
+                                          Create
+                                      </button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                     </form>
+                  </section>                
+                </div>
+              </div>
+          <!-- </div>
+        </div> -->
+      </div>
+  
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons">
+            <a class="button is-primary">
+              <strong>Pro Edition</strong>
+            </a>          
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
