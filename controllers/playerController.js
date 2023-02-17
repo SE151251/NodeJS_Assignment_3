@@ -35,6 +35,7 @@ class PlayerController {
   }
   create(req, res, next) {
     const player = new Players(req.body);
+    console.log(req.body)
     // Players.find({ name: player.name })
     //   .then((player) => {
     //     if (player) {
