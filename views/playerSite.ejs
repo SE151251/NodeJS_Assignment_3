@@ -1,46 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ('./patials/head') %>
-    <body>
-        <div class="container is-fluid" style="display: flex; justify-content: center; margin-top: 100px;">
+    <body style="background-color: rgb(247, 210, 162); height: 100vh;">
+        <div class="container is-fluid" style="display: flex; justify-content: center; padding-top: 100px; background-color: rgb(247, 210, 162);">
                 <div>
-                    <table class="table" style="width: 1000px;">
-                        <thead>
+                    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" style="width: 1000px;">
+                        <thead style="height: 40px; background-color: aqua; ">
                             <tr>
-                                <th>Image</th>
-                                <th>Name</th>
-                                <th>Club</th>
-                                <th>Postion</th>
-                                <th>Goals</th>
-                                <th>isCaptain</th>
-                                <th>Actions</th>
+                                <th style="text-align: center;">Image</th>
+                                <th style="text-align: center;">Name</th>
+                                <th style="text-align: center;">Club</th>
+                                <th style="text-align: center;">Postion</th>
+                                <th style="text-align: center;">Goals</th>
+                                <th style="text-align: center;">isCaptain</th>
+                                <th style="text-align: center;">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="text-align: center;">
                             <% players.forEach(function(player) { %>
                                 <tr>
-                                    <td>
-                                        <figure class="image is-64x64">
+                                    <td style="display: flex; align-items: center; justify-content: center; padding-top: 20px;">
+                                        <figure  class="image is-64x64">
                                             <img src=<%=player.image %> >
                                         </figure>
                                     </td>
-                                    <td>
+                                    <td style="padding-top: 24px;">
                                         <%= player.name %>
                                     </td>
-                                    <td>
+                                    <td style="padding-top: 24px;">
                                         <%= player.club %>
                                     </td>
-                                    <td>
+                                    <td style="padding-top: 24px;">
                                         <%= player.position %>
                                     </td>
-                                    <td>
+                                    <td style="padding-top: 24px;">
                                         <%= player.goals %>
                                     </td>
-                                    <td>
+                                    <td style="padding-top: 24px;">
                                         <%=player.isCaptain===true ? 'Captain' : 'No' %>
 
                                     </td>
-                                    <td>
+                                    <td style="padding-top: 24px;">
 
                                         <div class="dropdown">
                                             <div class="dropdown-trigger">
