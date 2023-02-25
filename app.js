@@ -3,10 +3,14 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+const session = require('express-session');
+const passport = require('passport');
+const flash = require('connect-flash');
 const mongoose = require("mongoose");
-const players = require("./model/player");
 const nationRouter = require("./routes/nationRouter");
 const playerRouter = require("./routes/playerRouter");
+const userRouter = require("./routes/userRouter");
+require('./config/passport')(passport);
 const url = "mongodb://127.0.0.1:27017/worldcup2022";
 const connect = mongoose.connect(url);
 // mongoose.set('strictQuery',true);
@@ -19,9 +23,24 @@ connect
   });
 
 var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
 
 var app = express();
+app.use(
+  session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
+app.use(function(req, res, next) {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+ res.locals.error = req.flash('error');
+  next();
+});
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -33,8 +52,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/nations", nationRouter);
 app.use("/players", playerRouter);
+app.use("/users", userRouter);
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
