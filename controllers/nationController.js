@@ -12,7 +12,6 @@ class NationController {
   }
   create(req, res, next) {
     const nation = new Nations(req.body);
-    console.log(nation.name);
     Nations.find({ name: nation.name }).then((nationCheck) => {
       if (nationCheck.length > 0) {
         req.flash("error_msg", "Duplicate nation name!");
@@ -39,15 +38,12 @@ class NationController {
   edit(req, res, next) {
     Nations.updateOne({ _id: req.params.nationId }, req.body)
       .then(() => {
-        res.redirect("/nations");
+        return res.redirect("/nations");
       })
       .catch((err) => {
-        res.render("editNation", {
-          title: "The detail of Nation",
-          nation: req.body,
-          errorMess:
-            "This nation name is already in use!!! Please input another name",
-        });
+        console.log("error update: ", err);
+        req.flash("error_msg", "Duplicate nation name!");
+        res.redirect(`/nations/edit/${req.params.nationId}`);
       });
   }
   delete(req, res, next) {

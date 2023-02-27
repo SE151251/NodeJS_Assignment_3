@@ -70,7 +70,7 @@ class userController {
   }
   dashboard(req, res, next) {
     console.log("dashboard: ",req.user);
-    res.render("dashboard");
+    res.redirect("/players");
   }
   signout(req, res, next) {
     req.logout(function (err) {

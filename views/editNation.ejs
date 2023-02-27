@@ -3,6 +3,9 @@
 <%- include ('./patials/head') %>
 <body>
     <h1 style="text-align: center; margin-top: 100px; font-size: 40px; font-weight: 500; margin-bottom: 20px;">UPDATE NATION</h1>
+    <% if(error_msg != ''){ %>
+        <%= error_msg %>
+    <% } %>
     <form method="post" class="container is-max-desktop" style="margin-top: 10px;">
         <div class="field is-horizontal" style="margin-bottom: 30px;">
             <div class="field-label is-normal">
@@ -52,21 +55,6 @@
 </body>
 <script>
     // Show error message
-    <% if (errorMess) { %>
-    window.onload = function() {
-    Toastify({
-      text: "<%=errorMess %>",
-      duration: 5000,
-      gravity: "bottom",
-      position: "left",
-      backgroundColor: "#EE0000",
-      stopOnFocus: true,
-    }).showToast();
     
-    setTimeout(function(){
-      Toastify.hideToast();
-    }, 3000);
-  }
-        <% } %>
         </script>
 </html>

@@ -13,11 +13,11 @@ var userSchema = new Schema({
     },
     name:  {
         type: String,
-        required: true
+        default: "User Name"
     },
     YOB:  {
         type: String,
-        required: true
+        default:"2001"
     },
     isAdmin:  {
         type: Boolean,

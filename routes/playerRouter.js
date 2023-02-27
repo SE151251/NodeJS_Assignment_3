@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const playerController = require("../controllers/playerController");
 const multer = require("multer");
+const {ensureAuthenticated} = require('../config/auth')
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/images/Players/");
@@ -23,10 +24,10 @@ playerRouter.use(bodyParser.json());
 playerRouter
   .route("/")
   .get(playerController.index)
-  .post(upload.single("file"), playerController.create);
+  .post(ensureAuthenticated,upload.single("file"), playerController.create);
 playerRouter
   .route("/edit/:playerId")
-  .get(playerController.formEdit)
-  .post(upload.single("file"), playerController.edit);
+  .get(ensureAuthenticated,playerController.formEdit)
+  .post(ensureAuthenticated,upload.single("file"), playerController.edit);
 playerRouter.route("/delete/:playerId").get(playerController.delete);
 module.exports = playerRouter;
