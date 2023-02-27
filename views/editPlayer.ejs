@@ -3,7 +3,10 @@
 <%- include ('./patials/head') %>
 <body>
     <h1 style="text-align: center; margin-top: 100px; font-size: 40px; font-weight: 500; margin-bottom: 20px;">UPDATE PLAYER</h1>
-    <form method="post" class="container is-max-desktop" style="margin-top: 10px;">
+    <% if(error_msg != ''){ %>
+        <%= error_msg %>
+    <% } %>
+    <form method="post" class="container is-max-desktop" style="margin-top: 10px;" enctype="multipart/form-data">
         <div class="field is-horizontal">
             <div class="field-label is-normal">
                 <label class="label">Name</label>
@@ -19,18 +22,50 @@
                 </div>
             </div>
         </div>
+        
         <div class="field is-horizontal">
             <div class="field-label is-normal">
-                <label class="label">Club</label>
+                <label class="label">Image</label>
+            </div>
+            <div class="field-body">
+                <div class="field">
+                    <div class="control">
+                        <div><figure class="image is-128x128">
+                            <img  src="<%=player.image%>">
+                          </figure></div>
+                        <div class="file has-name is-boxed">
+                            <label class="file-label">
+                                <input class="file-input" type="file" name="file">
+                                <span class="file-cta" >
+                                    <span class="file-icon">
+                                        <i class="fas fa-upload"></i>
+                                    </span>
+                                    <span class="file-label">
+                                        Choose a file…
+                                    </span>
+                                </span>
+                                <span class="file-name">
+                                    No file selected
+                                </span>
+                            </label>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Career</label>
             </div>
             <div class="field-body">
                 <div class="field is-narrow">
                     <div class="control">
                         <div class="select is-fullwidth">
-                            <select name="club">
+                            <select name="career">
                                 <%for (let club of clubList){ %>
                                     <option value="<%= club.name %>"
-                                        <%=JSON.stringify(club.name)===JSON.stringify(player.club) ? 'selected' : '' %>><%=
+                                        <%=JSON.stringify(club.name)===JSON.stringify(player.career) ? 'selected' : '' %>><%=
                                             club.name %>
                                     </option>
                                     <% } %>
@@ -41,18 +76,6 @@
             </div>
         </div>
     
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Image</label>
-            </div>
-            <div class="field-body">
-                <div class="field">
-                    <div class="control">
-                        <input class="input is-info" name="image" required type="text" value="<%= player.image %>">
-                    </div>                    
-                </div>
-            </div>
-        </div>
         <div class="field is-horizontal">
             <div class="field-label is-normal">
                 <label class="label">Position</label>
@@ -83,6 +106,26 @@
                     <div class="control">
                         <input class="input is-info" name="goals" required min="0" type="number" value="<%= player.goals %>">
                     </div>                    
+                </div>
+            </div>
+        </div>
+        <div class="field is-horizontal">
+            <div class="field-label is-normal">
+                <label class="label">Nation</label>
+            </div>
+            <div class="field-body">
+                <div class="field is-narrow">
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="nation">
+                                <%for (let nation of nationsList){ %>
+                                    <option value="<%= nation._id %>">
+                                        <%= nation.name %>
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

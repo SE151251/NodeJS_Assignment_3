@@ -2,6 +2,7 @@ var createError = require("http-errors");
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 var logger = require("morgan");
 const session = require('express-session');
 const passport = require('passport');
@@ -11,7 +12,7 @@ const nationRouter = require("./routes/nationRouter");
 const playerRouter = require("./routes/playerRouter");
 const userRouter = require("./routes/userRouter");
 require('./config/passport')(passport);
-const url = "mongodb://127.0.0.1:27017/worldcup2022";
+const url = "mongodb://127.0.0.1:27017/assignment3";
 const connect = mongoose.connect(url);
 // mongoose.set('strictQuery',true);
 connect
@@ -25,6 +26,11 @@ connect
 var indexRouter = require("./routes/index");
 
 var app = express();
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 app.use(
   session({
     secret: 'secret',
@@ -50,6 +56,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(__dirname + '/uploads'));
 app.use("/nations", nationRouter);
 app.use("/players", playerRouter);
 app.use("/users", userRouter);

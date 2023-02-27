@@ -10,8 +10,21 @@ var userSchema = new Schema({
     password:  {
         type: String,
         required: true
+    },
+    name:  {
+        type: String,
+        required: true
+    },
+    YOB:  {
+        type: String,
+        required: true
+    },
+    isAdmin:  {
+        type: Boolean,
+        required: true,
+        default: false
     }
 },
 {timestamps: true});
 
-module.exports = mongoose.model('Users', userSchema);
+module.exports = mongoose.model('users', userSchema);

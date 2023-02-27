@@ -1,8 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ('./patials/head') %>
-
     <body style="background-color: rgb(247, 210, 162); height: 100vh;">
+        <a onClick="document.querySelector('#popup2').classList.add('is-active')">
+            <i class="fa-solid fa-heart-circle-plus" style="margin-right: 5px; margin-top: 200px;"></i>
+            New Nation
+        </a>        
+        <% if(error_msg != ''){ %>
+            <%= error_msg %>
+        <% } %>
+        <!-- Popup -->
+        <div id="popup2" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head" style="background-color: hsl(171, 100%, 41%);">
+                    <p class="modal-card-title" style="text-align: center; font-weight: 700;"> ADD NEW NATION</p>
+                    <button class="delete" aria-label="close"
+                        onclick="document.querySelector('#popup2').classList.remove('is-active')"></button>
+                </header>
+                <section class="modal-card-body">                   
+                    <form method="post" action="/nations">
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Nation</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input is-info" required name="name" type="text"
+                                            placeholder="e.g. Brazil">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">Description</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input is-info" required name="description" type="text"
+                                            placeholder="Let's description">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>                  
+                        <div class="field is-horizontal" style="margin-left: 120px;">
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <button class="button is-primary" type="submit" style="font-weight: 700">
+                                            Create
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+   
+        <!-- table content -->
         <div class="container is-fluid"
             style="display:flex; justify-content: center; background-color: rgb(247, 210, 162); padding-top: 100px;">
             <div>
@@ -35,10 +96,11 @@
                                         </div>
                                         <div class="dropdown-menu" id="dropdown-menu" role="menu">
                                             <div class="dropdown-content" style="width: 120px">
-                                                <a style="background-color: antiquewhite;" class="dropdown-item" href="/nations/edit/<%=nation.id %>"><i
-                                                        class="fa-solid fa-pencil"
+                                                <a style="background-color: antiquewhite;" class="dropdown-item"
+                                                    href="/nations/edit/<%=nation.id %>"><i class="fa-solid fa-pencil"
                                                         style="margin-left: 6px; margin-right: 10px;"></i>Edit</a>
-                                                <a style="background-color: rgb(238, 116, 116);" class="dropdown-item" href="/nations/delete/<%=nation.id %>"
+                                                <a style="background-color: rgb(238, 116, 116);" class="dropdown-item"
+                                                    href="/nations/delete/<%=nation.id %>"
                                                     onclick="return confirm('Are you sure ???')"><i
                                                         class="fa-solid fa-trash-can"
                                                         style="margin-left: 6px; margin-right: 10px;"></i>Delete</button></a>
@@ -56,26 +118,10 @@
             </div>
 
             </div>
+            <!-- popup -->
+
     </body>
     <script>
-    // Show error message
-    <% if (errorMess) { %>
-           window.onload = function() {
-                Toastify({
-                    text: "<%=errorMess %>",
-                    duration: 5000,
-                    gravity: "bottom",
-                    position: "left",
-                    backgroundColor: "#EE0000",
-                    stopOnFocus: true,
-                }).showToast();
-
-                setTimeout(function () {
-                    Toastify.hideToast();
-                }, 3000);
-            }
-        <% } %>
-
             document.addEventListener('DOMContentLoaded', function () {
                 // Get all "dropdown" elements
                 var dropdowns = Array.prototype.slice.call(document.querySelectorAll('.dropdown'), 0);
@@ -98,7 +144,7 @@
                         dropdown.classList.remove('is-active');
                     });
                 }
-            });
+            });       
     </script>
 
 </html>

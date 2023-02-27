@@ -1,4 +1,6 @@
 const Players = require("../model/player");
+const Nations = require("../model/nation");
+
 let clubData = [
   { id: "1", name: "Arsenal" },
   { id: "2", name: "Manchester United" },
@@ -22,68 +24,112 @@ let postitionData = [
 ];
 class PlayerController {
   index(req, res, next) {
-    Players.find({})
-      .then((players) => {
-        res.render("playerSite", {
-          title: "The list of Players",
-          players: players,
-          positionList: postitionData,
-          clubList: clubData,
-        });
+    Nations.find({})
+      .then((nations) => {
+        Players.find({})
+          .populate("nation", ["name", "description"])
+          .then((players) => {
+            res.render("playerSite", {
+              title: "The list of Players",
+              players: players,
+              positionList: postitionData,
+              clubList: clubData,
+              nationsList: nations,
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            next();
+          });
       })
-      .catch(next);
+      .catch((err) => {
+        console.log(err);
+        next();
+      });
   }
   create(req, res, next) {
-    const player = new Players(req.body);
-    console.log(req.body)
-    // Players.find({ name: player.name })
-    //   .then((player) => {
-    //     if (player) {
-    //       Players.find({})
-    //       .then((players) => {
-    //         return res.render("playerSite", {
-    //           title: "The list of Players",
-    //           players: players,
-    //           positionList: postitionData,
-    //           clubList: clubData,            
-    //         });
-    //       })
-    //       .catch(next);
-    //     }
-    //   })
-    //   .catch(next);
-    if (player.isCaptain == undefined) {
-      player.isCaptain = false;
-    }
-    player
-      .save()
-      .then(() => res.redirect("/players"))
-      .catch(next);
+    console.log(req.body, req.file);
+    console.log(__dirname);
+    var data = {
+      name: req.body.name,
+      image:
+        req.file === undefined
+          ? ""
+          : `/images/Players/${req.file.originalname}`,
+      career: req.body.career,
+      position: req.body.position,
+      goals: req.body.goals,
+      nation: req.body.nation,
+      isCaptain: req.body.isCaptain === undefined ? false : true,
+    };
+    console.log("data: ", data);
+    const player = new Players(data);
+    Players.find({ name: player.name }).then((playerCheck) => {
+      if (playerCheck.length > 0) {
+        req.flash("error_msg", "Duplicate player name!");
+        res.redirect("/players");
+      } else {
+        console.log(player);
+        player
+          .save()
+          .then(() => res.redirect("/players"))
+          .catch(next);
+      }
+    });
   }
 
   formEdit(req, res, next) {
     const playerId = req.params.playerId;
-    Players.findById(playerId)
-      .then((player) => {
-        res.render("editPlayer", {
-          title: "The detail of Player",
-          player: player,
-          positionList: postitionData,
-          clubList: clubData,
-          errorMess:""
-        });
+    Nations.find({})
+      .then((nations) => {
+        Players.findById(playerId)
+          .then((player) => {
+            res.render("editPlayer", {
+              title: "The detail of Player",
+              player: player,
+              positionList: postitionData,
+              clubList: clubData,
+              nationsList: nations,
+            });
+          })
+          .catch(next);
       })
       .catch(next);
   }
   edit(req, res, next) {
-    if (req.body.isCaptain == undefined) {
-      req.body.isCaptain = false;
-    }
-    Players.updateOne({ _id: req.params.playerId }, req.body)
-      .then(() => {
-        res.redirect("/players");
-      })
-      .catch(next);
+    Players.find({ name: req.body.name }).then((playerCheck) => {
+      if (playerCheck.length > 0) {
+        req.flash("error_msg", "Duplicate player name!");
+        res.redirect(`/players/edit/${req.params.playerId}`);
+      } else {
+        var data;
+        if (!req.file) {
+          data = {
+            name: req.body.name,
+            career: req.body.career,
+            position: req.body.position,
+            goals: req.body.goals,
+            nation: req.body.nation,
+            isCaptain: req.body.isCaptain === undefined ? false : true,
+          };
+        } else {
+          data = {
+            name: req.body.name,
+            image: `/images/Players/${req.file.originalname}`,
+            career: req.body.career,
+            position: req.body.position,
+            goals: req.body.goals,
+            nation: req.body.nation,
+            isCaptain: req.body.isCaptain === undefined ? false : true,
+          };
+        }
+        Players.updateOne({ _id: req.params.playerId }, data)
+          .then(() => {
+            res.redirect("/players");
+          })
+          .catch(next);
+      }
+    });
   }
   delete(req, res, next) {
     Players.findByIdAndDelete({ _id: req.params.playerId })

@@ -1,36 +1,21 @@
 const mongoose = require("mongoose");
-mongoose.set('strictQuery',true);
+mongoose.set("strictQuery", true);
 const Schema = mongoose.Schema;
-var playerSchema = new Schema(
+const playerSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: true,
+    name: { type: String, require: true },
+    image: { type: String, require: true },
+    career: { type: String },
+    position: { type: String, require: true },
+    goals: { type: Number, require: true, default: 0 },
+    nation: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "nations",
+      require: true,
     },
-    image: {
-      type: String,
-      required: true,
-    },
-    club: {
-        type: String,
-      required: true,
-      },
-      position: {
-        type: String,
-         required: true,
-      },
-      goals: {
-        type: Number,
-         required: true,
-      },
-      isCaptain: {
-        type: Boolean,
-        required: true,
-      },
+    isCaptain: { type: Boolean, default: false  },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 var players = mongoose.model("players", playerSchema);

@@ -3,7 +3,10 @@ const bodyParser = require("body-parser");
 const userController = require('../controllers/userController')
 const userRouter = express.Router();
 const {ensureAuthenticated} = require('../config/auth')
+
 userRouter.use(bodyParser.json())
+userRouter.route('/')
+ .get(userController.index)
 userRouter.route('/login')
  .get(userController.login)
  .post(userController.signin)
