@@ -88,35 +88,26 @@ class userController {
 
   //update user
   formEdit(req, res, next) {
-    if(req.user._id !== req.params.userId){
-      req.flash('error_msg',"You can not update info of another account!!!")
-      return res.redirect("/");
-    }
-    const userId = req.params.userId
+    const userId = req.session.passport.user
+    console.log("id: ",userId);
         User.findById(userId)
           .then((user) => {
             res.render("profile", {
               title: "The detail of User",
-              user:user,
-              positionList: postitionData,
-              clubList: clubData,
-              nationsList: nations,
+              user:user,             
             });
           })
           .catch(next);
   }
   edit(req, res, next) {
-    if(req.user._id !== req.params.userId){
-      req.flash('error_msg',"You can not update info of another account!!!")
-      return res.redirect("/");
-    }
         var data = {
             name: req.body.name,          
             YOB: req.body.yob,          
-          };    
-        User.updateOne({ _id: req.params.userId }, data)
+          };  
+          console.log("data user update: ", data);  
+        User.updateOne({ _id: req.session.passport.user }, data)
           .then(() => {
-            res.redirect("/players");
+            res.redirect("/");
           })
           .catch((err) => {
             console.log("error update: ", err);

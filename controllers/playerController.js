@@ -48,6 +48,7 @@ class PlayerController {
       });
   }
   index(req, res, next) {
+    console.log(req.session);
     Nations.find({})
       .then((nations) => {
         Players.find({})

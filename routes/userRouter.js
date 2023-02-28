@@ -16,7 +16,7 @@ userRouter.route('/login')
  .get(userController.signout)
  userRouter.route('/dashboard')
   .get(ensureAuthenticated,userController.dashboard)
-  userRouter.route('/edit/:userId')
+  userRouter.route('/edit')
   .get(ensureAuthenticated,userController.formEdit)
   .post(ensureAuthenticated,userController.edit)
 module.exports = userRouter;
