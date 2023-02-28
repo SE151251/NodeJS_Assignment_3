@@ -23,6 +23,30 @@ let postitionData = [
   { id: "9", name: " Attacker " },
 ];
 class PlayerController {
+  home(req, res, next) {
+    Nations.find({})
+      .then((nations) => {
+        Players.find({})
+          .populate("nation", ["name", "description"])
+          .then((players) => {
+            res.render("index", {
+              title: "The list of Players",
+              players: players,
+              positionList: postitionData,
+              clubList: clubData,
+              nationsList: nations,
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            next();
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        next();
+      });
+  }
   index(req, res, next) {
     Nations.find({})
       .then((nations) => {
@@ -77,7 +101,27 @@ class PlayerController {
       }
     });
   }
-
+  playerDetail(req, res, next) {
+    const playerId = req.params.playerId;
+    console.log(playerId);
+    console.log("zo detail");
+    Nations.find({})
+      .then((nations) => {
+        Players.findById(playerId).populate("nation","name")
+          .then((player) => {
+            console.log(player);
+            res.render("playerDetail", {
+              title: "The detail of Player",
+              player: player,
+              positionList: postitionData,
+              clubList: clubData,
+              nationsList: nations,
+            });
+          })
+          .catch(next);
+      })
+      .catch(next);
+  }
   formEdit(req, res, next) {
     const playerId = req.params.playerId;
     Nations.find({})

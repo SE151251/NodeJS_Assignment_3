@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ('./patials/head') %>
-    <body style="background-color: rgb(247, 210, 162); height: 100vh;">
-        <a onClick="document.querySelector('#popup2').classList.add('is-active')">
-            <i class="fa-solid fa-heart-circle-plus" style="margin-right: 5px; margin-top: 200px;"></i>
+    <body style=" height: 100vh;">
+        <a style="position: fixed; bottom: 0; right: 0;" onClick="document.querySelector('#popup2').classList.add('is-active')">
+          
             New Nation
         </a>        
         <% if(error_msg != ''){ %>
@@ -65,9 +65,9 @@
    
         <!-- table content -->
         <div class="container is-fluid"
-            style="display:flex; justify-content: center; background-color: rgb(247, 210, 162); padding-top: 100px;">
+            style="display:flex; justify-content: center; padding-top: 100px;">
             <div>
-                <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" style="width: 1000px;">
+                <table id="mytable" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" style="width: 1000px;">
                     <thead style="height: 40px; background-color: aqua;">
                         <tr>
                             <th style="text-align: center;">Nations</th>
@@ -96,10 +96,10 @@
                                         </div>
                                         <div class="dropdown-menu" id="dropdown-menu" role="menu">
                                             <div class="dropdown-content" style="width: 120px">
-                                                <a style="background-color: antiquewhite;" class="dropdown-item"
+                                                <a  class="dropdown-item"
                                                     href="/nations/edit/<%=nation.id %>"><i class="fa-solid fa-pencil"
                                                         style="margin-left: 6px; margin-right: 10px;"></i>Edit</a>
-                                                <a style="background-color: rgb(238, 116, 116);" class="dropdown-item"
+                                                <a  class="dropdown-item"
                                                     href="/nations/delete/<%=nation.id %>"
                                                     onclick="return confirm('Are you sure ???')"><i
                                                         class="fa-solid fa-trash-can"
@@ -122,6 +122,9 @@
 
     </body>
     <script>
+         $(document).ready(function () {
+            $('#mytable').DataTable();
+        });
             document.addEventListener('DOMContentLoaded', function () {
                 // Get all "dropdown" elements
                 var dropdowns = Array.prototype.slice.call(document.querySelectorAll('.dropdown'), 0);

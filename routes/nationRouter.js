@@ -3,6 +3,7 @@ const nationRouter = express.Router();
 const bodyParser = require("body-parser");
 const nationController = require("../controllers/nationController");
 const {ensureAuthenticated} = require('../config/auth')
+const {requireRole} = require('../config/verifyRole')
 nationRouter.use(bodyParser.json());
 nationRouter
   .route("/")
@@ -10,7 +11,7 @@ nationRouter
   .post(ensureAuthenticated,nationController.create);
 nationRouter
   .route("/edit/:nationId")
-  .get(ensureAuthenticated,nationController.formEdit)
+  .get(ensureAuthenticated,requireRole, nationController.formEdit)
   .post(ensureAuthenticated,nationController.edit);
 nationRouter.route("/delete/:nationId").get(nationController.delete);
 
