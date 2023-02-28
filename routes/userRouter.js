@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const userController = require('../controllers/userController')
 const userRouter = express.Router();
 const {ensureAuthenticated} = require('../config/auth')
+const {requireRole} = require('../config/verifyRole')
 
 userRouter.use(bodyParser.json())
 userRouter.route('/')
@@ -15,5 +16,8 @@ userRouter.route('/login')
  .get(userController.signout)
  userRouter.route('/dashboard')
   .get(ensureAuthenticated,userController.dashboard)
+  userRouter.route('/edit/:userId')
+  .get(ensureAuthenticated,userController.formEdit)
+  .post(ensureAuthenticated,userController.edit)
 module.exports = userRouter;
 

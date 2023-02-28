@@ -6,12 +6,15 @@ class userController {
   index(req, res, next) {
     res.render("register");
   }
-  loginJWT(req, res, next) {
-  var token = authenticate.getToken({_id: req.user._id});
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'application/json');
-  res.json({success: true, token: token, status: 'You are successfully logged in!'});
+  listUsers(req, res, next) {
+    User.find({}).then((users) => {
+      res.render("accounts", {
+        title: "The list of Users",
+        users: users,     
+      });
+    }).catch(next)
   }
+
   
   regist(req, res, next) {
     const { username, password } = req.body;
@@ -81,6 +84,46 @@ class userController {
     //  res.clearCookie('jwt');
       res.redirect("/users/login");
     });
+  }
+
+  //update user
+  formEdit(req, res, next) {
+    if(req.user._id !== req.params.userId){
+      req.flash('error_msg',"You can not update info of another account!!!")
+      return res.redirect("/");
+    }
+    const userId = req.params.userId
+        User.findById(userId)
+          .then((user) => {
+            res.render("profile", {
+              title: "The detail of User",
+              user:user,
+              positionList: postitionData,
+              clubList: clubData,
+              nationsList: nations,
+            });
+          })
+          .catch(next);
+  }
+  edit(req, res, next) {
+    if(req.user._id !== req.params.userId){
+      req.flash('error_msg',"You can not update info of another account!!!")
+      return res.redirect("/");
+    }
+        var data = {
+            name: req.body.name,          
+            YOB: req.body.yob,          
+          };    
+        User.updateOne({ _id: req.params.userId }, data)
+          .then(() => {
+            res.redirect("/players");
+          })
+          .catch((err) => {
+            console.log("error update: ", err);
+            req.flash("error_msg", "Duplicate player name!");
+            res.redirect(`/users/edit/${req.params.userId}`);
+          });
+      
   }
 }
 

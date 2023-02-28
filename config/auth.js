@@ -5,7 +5,6 @@ var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 module.exports = {
         ensureAuthenticated: function(req, res, next) {
            if(req.isAuthenticated()){
-            console.log(req.user)
                return next();
            }
            req.flash('error_msg', 'Please log in first!');

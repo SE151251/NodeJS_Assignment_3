@@ -141,11 +141,6 @@ class PlayerController {
       .catch(next);
   }
   edit(req, res, next) {
-    Players.find({ name: req.body.name }).then((playerCheck) => {
-      if (playerCheck.length > 0) {
-        req.flash("error_msg", "Duplicate player name!");
-        res.redirect(`/players/edit/${req.params.playerId}`);
-      } else {
         var data;
         if (!req.file) {
           data = {
@@ -171,9 +166,12 @@ class PlayerController {
           .then(() => {
             res.redirect("/players");
           })
-          .catch(next);
-      }
-    });
+          .catch((err) => {
+            console.log("error update: ", err);
+            req.flash("error_msg", "Duplicate player name!");
+            res.redirect(`/players/edit/${req.params.playerId}`);
+          });
+      
   }
   delete(req, res, next) {
     Players.findByIdAndDelete({ _id: req.params.playerId })

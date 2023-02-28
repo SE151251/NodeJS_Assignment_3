@@ -2,7 +2,8 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const playerController = require("../controllers/playerController");
 const multer = require("multer");
-const { ensureAuthenticated } = require("../config/auth");
+const {ensureAuthenticated} = require('../config/auth')
+const {requireRole} = require('../config/verifyRole')
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "public/images/Players/");
@@ -23,12 +24,12 @@ const playerRouter = express.Router();
 playerRouter.use(bodyParser.json());
 playerRouter
   .route("/")
-  .get(playerController.index)
-  .post(ensureAuthenticated, upload.single("file"), playerController.create);
+  .get(ensureAuthenticated,requireRole,playerController.index)
+  .post(ensureAuthenticated,requireRole, upload.single("file"), playerController.create);
 playerRouter
   .route("/edit/:playerId")
-  .get(ensureAuthenticated, playerController.formEdit)
-  .post(ensureAuthenticated, upload.single("file"), playerController.edit);
+  .get(ensureAuthenticated,requireRole, playerController.formEdit)
+  .post(ensureAuthenticated,requireRole, upload.single("file"), playerController.edit);
 playerRouter.route("/:playerId").get(playerController.playerDetail);
-playerRouter.route("/delete/:playerId").get(playerController.delete);
+playerRouter.route("/delete/:playerId").get(ensureAuthenticated,requireRole,playerController.delete);
 module.exports = playerRouter;
