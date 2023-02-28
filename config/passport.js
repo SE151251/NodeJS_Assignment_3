@@ -31,13 +31,32 @@ module.exports = function (passport) {
       }
     )
   );
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
-  });
+  // passport.serializeUser((user, done) => {
+  //   done(null, user.id);
+  // });
 
-  passport.deserializeUser((id, done) => {
-    User.findById(id, (error, user) => {
-      done(error, user);
+  // passport.deserializeUser((id, done) => {
+  //   User.findById(id, (error, user) => {
+  //     done(error, user);
+  //   });
+  // });
+  passport.serializeUser((user, done) => {
+    done(null, { id: user.id, name: user.name, role: user.isAdmin === true ? "admin" : "user" });
+  });
+  
+  passport.deserializeUser((data, done) => {
+    User.findById(data.id, (error, user) => {
+      if (error) {
+        return done(error);
+      }
+      if (!user) {
+        return done(null, false);
+      }
+      return done(null, {
+        id: user.id,
+        name: user.name,
+        role: data.role
+      });
     });
   });
 };

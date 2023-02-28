@@ -7,9 +7,9 @@
         <a style="position: fixed; bottom: 0; right: 0;" onClick="document.querySelector('#popup').classList.add('is-active')">           
             New Player
         </a>
-        <% if(error_msg !='' ){ %>
+        <div style="margin-top: 100px;"><% if(error_msg != ''){ %>
             <%= error_msg %>
-                <% } %>
+        <% } %></div>      
                     <div id="popup" class="modal">
                         <div class="modal-background"></div>
                         <div class="modal-card">

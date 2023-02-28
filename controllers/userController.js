@@ -1,21 +1,22 @@
 const bcrypt = require("bcrypt");
 const User = require("../model/user");
 var passport = require("passport");
-var authenticate = require('../config/auth');
+var authenticate = require("../config/auth");
 class userController {
   index(req, res, next) {
     res.render("register");
   }
   listUsers(req, res, next) {
-    User.find({}).then((users) => {
-      res.render("accounts", {
-        title: "The list of Users",
-        users: users,     
-      });
-    }).catch(next)
+    User.find({})
+      .then((users) => {
+        res.render("accounts", {
+          title: "The list of Users",
+          users: users,
+        });
+      })
+      .catch(next);
   }
 
-  
   regist(req, res, next) {
     const { username, password } = req.body;
     let errors = [];
@@ -71,8 +72,9 @@ class userController {
       failureFlash: true,
     })(req, res, next);
   }
+
   dashboard(req, res, next) {
-    console.log("dashboard: ",req.user);
+    console.log("dashboard: ", req.user);
     res.redirect("/players");
   }
   signout(req, res, next) {
@@ -81,40 +83,41 @@ class userController {
         return next(err);
       }
       req.flash("success_msg", "You are logged out");
-    //  res.clearCookie('jwt');
+      //  res.clearCookie('jwt');
       res.redirect("/users/login");
     });
   }
 
   //update user
   formEdit(req, res, next) {
-    const userId = req.session.passport.user
-    console.log("id: ",userId);
-        User.findById(userId)
-          .then((user) => {
-            res.render("profile", {
-              title: "The detail of User",
-              user:user,             
-            });
-          })
-          .catch(next);
+    const userId = req.session.passport.user.id;
+    console.log(userId);
+    User.findById(userId)
+      .then((user) => {
+        console.log(user);
+        res.render("profile", {
+          title: "The detail of User",
+          user: user,
+        });
+      })
+      .catch((err)=>{
+        console.log(err);
+      });
   }
   edit(req, res, next) {
-        var data = {
-            name: req.body.name,          
-            YOB: req.body.yob,          
-          };  
-          console.log("data user update: ", data);  
-        User.updateOne({ _id: req.session.passport.user }, data)
-          .then(() => {
-            res.redirect("/");
-          })
-          .catch((err) => {
-            console.log("error update: ", err);
-            req.flash("error_msg", "Duplicate player name!");
-            res.redirect(`/users/edit/${req.params.userId}`);
-          });
-      
+    var data = {
+      name: req.body.name,
+      YOB: req.body.yob,
+    };  
+    User.updateOne({ _id: req.session.passport.user.id }, data)
+      .then(() => {
+        req.flash("success_msg", "Updated successfully!");
+        res.redirect(`/users/edit`);
+      })
+      .catch((err) => {
+        req.flash("error_msg", err);
+        res.redirect(`/users/edit`);
+      });
   }
 }
 

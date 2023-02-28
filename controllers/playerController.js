@@ -73,8 +73,17 @@ class PlayerController {
       });
   }
   create(req, res, next) {
-    console.log(req.body, req.file);
-    console.log(__dirname);
+    Nations.find({})
+      .then((nations) => {
+        if(nations.length === 0) {
+          req.flash('error_msg', "Please input data of nations in Database first!!!");
+          return res.redirect('/players')
+        }
+      })
+      .catch((err) => {
+        req.flash('error_msg', "Server Error");
+        return res.redirect('/players')
+      });
     var data = {
       name: req.body.name,
       image:

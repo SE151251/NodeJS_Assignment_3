@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const userController = require('../controllers/userController')
 const userRouter = express.Router();
 const {ensureAuthenticated} = require('../config/auth')
-const {requireRole} = require('../config/verifyRole')
+const {redirectLogin} = require('../config/redirectLogin')
 
 userRouter.use(bodyParser.json())
 userRouter.route('/')
@@ -15,7 +15,7 @@ userRouter.route('/login')
  userRouter.route('/logout')
  .get(userController.signout)
  userRouter.route('/dashboard')
-  .get(ensureAuthenticated,userController.dashboard)
+  .get(ensureAuthenticated,redirectLogin,userController.dashboard)
   userRouter.route('/edit')
   .get(ensureAuthenticated,userController.formEdit)
   .post(ensureAuthenticated,userController.edit)

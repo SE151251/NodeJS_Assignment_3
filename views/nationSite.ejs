@@ -5,10 +5,11 @@
         <a style="position: fixed; bottom: 0; right: 0;" onClick="document.querySelector('#popup2').classList.add('is-active')">
           
             New Nation
-        </a>        
-        <% if(error_msg != ''){ %>
+        </a>  
+        <div style="margin-top: 100px;"><% if(error_msg != ''){ %>
             <%= error_msg %>
-        <% } %>
+        <% } %></div>      
+        
         <!-- Popup -->
         <div id="popup2" class="modal">
             <div class="modal-background"></div>
