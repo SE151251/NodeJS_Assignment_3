@@ -48,7 +48,6 @@ class PlayerController {
       });
   }
   index(req, res, next) {
-    console.log(req.session);
     Nations.find({})
       .then((nations) => {
         Players.find({})
@@ -113,13 +112,10 @@ class PlayerController {
   }
   playerDetail(req, res, next) {
     const playerId = req.params.playerId;
-    console.log(playerId);
-    console.log("zo detail");
     Nations.find({})
       .then((nations) => {
         Players.findById(playerId).populate("nation","name")
           .then((player) => {
-            console.log(player);
             res.render("playerDetail", {
               title: "The detail of Player",
               player: player,
