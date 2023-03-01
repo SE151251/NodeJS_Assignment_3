@@ -26,7 +26,7 @@ class PlayerController {
   home(req, res, next) {
     Nations.find({})
       .then((nations) => {
-        Players.find({})
+        Players.find({isCaptain: true})
           .populate("nation", ["name", "description"])
           .then((players) => {
             res.render("index", {
