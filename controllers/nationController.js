@@ -7,6 +7,7 @@ class NationController {
         res.render("nationSite", {
           title: "The list of Nations",
           nations: nations,
+          isLogin: req.session.passport === undefined ? false : true
         });
       })
       .catch(next);
@@ -32,6 +33,7 @@ class NationController {
         res.render("editNation", {
           title: "The detail of Nation",
           nation: nation,
+          isLogin: req.session.passport === undefined ? false : true
         });
       })
       .catch(next);

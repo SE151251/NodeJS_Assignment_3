@@ -12,6 +12,7 @@ class userController {
         res.render("accounts", {
           title: "The list of Users",
           users: users,
+          isLogin: req.session.passport === undefined ? false : true
         });
       })
       .catch(next);
@@ -98,6 +99,7 @@ class userController {
         res.render("profile", {
           title: "The detail of User",
           user: user,
+          isLogin: req.session.passport === undefined ? false : true
         });
       })
       .catch((err)=>{

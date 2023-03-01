@@ -24,6 +24,7 @@ let postitionData = [
 ];
 class PlayerController {
   home(req, res, next) {
+    console.log(req.session);
     Nations.find({})
       .then((nations) => {
         Players.find({isCaptain: true})
@@ -35,6 +36,7 @@ class PlayerController {
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
+              isLogin: req.session.passport === undefined ? false : true
             });
           })
           .catch((err) => {
@@ -59,6 +61,7 @@ class PlayerController {
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
+              isLogin: req.session.passport === undefined ? false : true
             });
           })
           .catch((err) => {
@@ -122,6 +125,7 @@ class PlayerController {
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
+              isLogin: req.session.passport === undefined ? false : true
             });
           })
           .catch(next);
@@ -140,6 +144,7 @@ class PlayerController {
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
+              isLogin: req.session.passport === undefined ? false : true
             });
           })
           .catch(next);
