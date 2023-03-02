@@ -7,13 +7,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
-    <% if (typeof errors != 'undefined') { %>
-	    <% errors.forEach(function (error){ %> 
-	      <div class="alert alert-warning alert-dismissible" role="alert">
-	        <%= error.msg %>
-	      </div>
-	   <% }); %> <% } %>
-    	<form method="post">
+
+	   <div style="display: flex; justify-content: center; align-items: center; width: 100vw; height: 100vh;background-size: cover; background-image: url(https://static.vecteezy.com/system/resources/previews/002/915/062/original/football-field-stadium-background-free-vector.jpg);">
+    	<form method="post" class="box" style="width: 30vw;">
 	    <div class="field">
 	        <label class="label">Username</label>
 	        <div class="control">
@@ -28,9 +24,16 @@
 	      </div>  
 	    <div class="field is-grouped">
 	        <div class="control">
-	          <button class="button is-link">Register</button>
+	          <button class="button is-primary">Register</button>
 	        </div>
 	    </div>
+			<% if (typeof errors != 'undefined') { %>
+				<% errors.forEach(function (error){ %> 
+				  <div class="notification is-danger is-light" style="padding: 2px; text-align: center;">
+					<%= error.msg %>
+				  </div>
+			   <% }); %> <% } %>
 	</form>
+</div>
 </body>
 </html>

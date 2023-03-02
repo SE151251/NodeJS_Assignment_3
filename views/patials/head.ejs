@@ -16,7 +16,7 @@
     aria-label="main navigation">
     <div class="navbar-brand">
         <a class="navbar-item" href="https://bulma.io">
-            <img src="https://bulma.io/images/bulma-logo.png" width="112" height="28">
+            <img src="https://irp.cdn-website.com/c57d8c85/dms3rep/multi/logo-world-cup-2022.webp" >
         </a>
 
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
@@ -32,30 +32,27 @@
                 <i class="fa-solid fa-house" style="margin-right: 5px;"></i>
                 Home
             </a>
-            <% if(isLogin===true) { %>
-                <div class="navbar-item has-dropdown is-hoverable">
-                    <a class="navbar-link">
-                        More
-                    </a>
-                    <div class="navbar-dropdown">
-                        <a class="navbar-item" href="/users/edit">
-                            Profile
-                        </a>
-                        <a class="navbar-item" href="/users/logout">
-                            Logout
-                        </a>
-                    </div>
-                </div>
-                <% } %>
-        </div>
-        <!-- <a class="navbar-item" href="/players">
+            <a class="navbar-item" href="/players">
                 <i class="fa-solid fa-person-walking" style="margin-right: 5px;"></i>
                 Player
             </a>
             <a class="navbar-item" href="/nations">
                 <i class="fa-solid fa-earth-americas" style="margin-right: 5px;"></i>
                 Nation
-            </a> -->
+            </a>
+            <a class="navbar-item" href="/users/edit">
+                <i class="fa-solid fa-user" style="margin-right: 5px;"></i>
+                Profile
+            </a>
+            <% if(isLogin===true) { %>
+
+                        <a class="navbar-item" href="/users/logout">
+                            Logout
+                        </a>
+
+                <% } %>
+        </div>
+        
     </div>
     <% if(isLogin===false) { %>
         <div class="navbar-end">
