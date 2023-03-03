@@ -1,13 +1,153 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- Designined by CodingLab | www.youtube.com/codinglabyt -->
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--<title> Responsiive Admin Dashboard | CodingLab </title>-->
+    <link rel="stylesheet" href="/stylesheets/admin.css">
+    <!-- Boxicons CDN Link -->
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
+    <script src="https://kit.fontawesome.com/589ebc73ef.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/js/bulma.min.js"
+        integrity="sha512-XSL8md+KzAg/ysd1EBcvzQx+8keNkzJ1pogDe+bJN9P5/RW+5c5v5d6Am++F6fmnt8wpD22fCaC/MP1M48hRtg=="
+        crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
 </head>
+
 <body>
-	<h1>This is admin page</h1> 
-    <a href="/users/logout" class="btn btn-sm btn-label-danger">Log out</a>
+    <div class="sidebar">
+        <div class="logo-details">
+            <div class="logo-details">
+                <i class='bx bx-menu sidebarBtn'></i>
+                <span>Dashboard</span>
+            </div>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="#" class="active">
+                    <i class='bx bx-grid-alt'></i>
+                    <span class="links_name">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bx-box'></i>
+                    <span class="links_name">Player</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class='bx bx-list-ul'></i>
+                    <span class="links_name">Nation</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <section class="home-section">
+        <nav>
+
+            <!-- <div class="profile-details"> -->
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    More
+                </a>
+
+                <div class="navbar-dropdown">
+                    <a class="navbar-item">
+                        Profile
+                    </a>
+                    <a class="navbar-item">
+                        Logout
+                    </a>
+                </div>
+            </div>
+            <!-- </div> -->
+        </nav>
+        <div class="home-content">
+            <div class="overview-boxes">
+                <div class="box">
+                    <div class="right-side">
+                        <div class="box-topic">Captain Player</div>
+                        <div>40,876</div>
+                    </div>
+                    <i class='bx bx-cart-alt cart'></i>
+                </div>
+                <div class="box">
+                    <div class="right-side">
+                        <div class="box-topic">Total Player</div>
+                        <div>38,876</div>
+
+                    </div>
+                    <i class='bx bxs-cart-add cart two'></i>
+                </div>
+                <div class="box">
+                    <div class="right-side">
+                        <div class="box-topic">Total User</div>
+                        <div>38,876</div>
+                    </div>
+                    <i class='bx bxs-cart-add cart two'></i>
+                </div>
+            </div>
+
+        </div>
+        <div>
+            <div id="chart_div"></div>
+              
+
+        </div>
+    </section>
+
+    <script>
+        let sidebar = document.querySelector(".sidebar");
+        let sidebarBtn = document.querySelector(".sidebarBtn");
+        sidebarBtn.onclick = function () {
+            sidebar.classList.toggle("active");
+            if (sidebar.classList.contains("active")) {
+                sidebarBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+            } else
+                sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+        }
+        // Load the Visualization API and the piechart package.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+      google.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+
+        // Create the data table.
+        var data = new google.visualization.DataTable();
+        // Create columns for the DataTable
+        data.addColumn('string');
+        data.addColumn('number', 'Devices');
+        // Create Rows with data
+        data.addRows([
+          ['SamSung', 21],
+          ['Apple', 14],
+          ['Huawei', 9],
+          ['LG', 4],
+          ['Xiaomi', 5],
+          ['ZTE', 5],
+          ['Other', 42]
+        ]);
+		//Create option for chart
+        var options = {
+          title: 'Global smartphone share Q2 2015',
+          'width': 1800,
+          'height': 600
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+
+    </script>
+
 </body>
+
 </html>

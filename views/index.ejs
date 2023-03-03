@@ -6,6 +6,9 @@
       <% if(error_msg !='' ){ %>
         <%= error_msg %>
           <% } %>
+          <% if(success_msg !='' ){ %>
+            <%= success_msg %>
+              <% } %>
     </div>
     <div class="columns is-multiline" style="margin-top: 120px; margin-left: 20px; margin-right: 20px;">
       <% players.forEach(function(player) { %>

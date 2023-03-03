@@ -1,25 +1,33 @@
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 
 module.exports = {
+    //with passport
         ensureAuthenticated: function(req, res, next) {
            if(req.isAuthenticated()){
                return next();
            }
            req.flash('error_msg', 'Please log in first!');
            res.redirect('/users/login');
-        }
-}
-   
-      //  const jwtAuth = (req, res, next) => {
-      //    const token = req.cookies.jwt;
-      //    if (!token) {
-      //      return res.redirect('/login');
-      //    }
-      //    jwt.verify(token, 'your_secret_key', (err, decoded) => {
-      //      if (err) {
-      //        return res.redirect('/login');
-      //      }
-      //      req.user = decoded;
-      //      next();
-      //    });
-      //  };  
+        },
+    
+        //with jwt
+        jwtAuth: (req, res, next) => {
+         const token = req.cookies.jwt;
+         console.log("token cookie", token);
+         if (!token) {
+            console.log("error token");
+           req.flash('error_msg', 'Please log in first!');
+           return res.redirect('/users/login');
+         }
+         jwt.verify(token, 'my_secret_key', (err, decoded) => {
+           if (err) {
+            req.flash('error_msg', err);
+             return res.redirect('/users/login');
+           }
+           console.log(decoded);
+           req.name = decoded.user.name;
+           req.role = decoded.user.role;
+           next();
+         });
+       } 
+    }

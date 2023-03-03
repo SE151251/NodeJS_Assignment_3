@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("../model/user");
 var passport = require("passport");
-var authenticate = require("../config/auth");
+var jwt = require("jsonwebtoken");
 class userController {
   index(req, res, next) {
     res.render("register");
@@ -12,7 +12,7 @@ class userController {
         res.render("accounts", {
           title: "The list of Users",
           users: users,
-          isLogin: req.session.passport === undefined ? false : true
+          isLogin: req.session.passport === undefined ? false : true,
         });
       })
       .catch(next);
@@ -75,8 +75,8 @@ class userController {
   }
 
   dashboard(req, res, next) {
-    console.log("dashboard: ", req.user);
-    res.redirect("/players");
+    
+    res.render("dashboard",{title: "Dashboard", isLogin: req.session.passport === undefined ? false : true,})
   }
   signout(req, res, next) {
     req.logout(function (err) {
@@ -99,10 +99,10 @@ class userController {
         res.render("profile", {
           title: "The detail of User",
           user: user,
-          isLogin: req.session.passport === undefined ? false : true
+          isLogin: req.session.passport === undefined ? false : true,
         });
       })
-      .catch((err)=>{
+      .catch((err) => {
         console.log(err);
       });
   }
@@ -110,7 +110,7 @@ class userController {
     var data = {
       name: req.body.name,
       YOB: req.body.yob,
-    };  
+    };
     User.updateOne({ _id: req.session.passport.user.id }, data)
       .then(() => {
         req.flash("success_msg", "Updated successfully!");
@@ -121,39 +121,50 @@ class userController {
         res.redirect(`/users/edit`);
       });
   }
+  loginJWT(req, res, next) {
+    const userName = req.body.userName;
+    const password = req.body.password;
+    User.findOne({ username: userName })
+      .then((user) => {
+        if (!user) {
+          req.flash("error_msg", "This username is not registed!");
+          return res.redirect("/users/login");
+        }
+        //Match password
+        bcrypt.compare(password, user.password, (err, isMatch) => {
+          if (err) throw err;
+          if (isMatch) {
+            console.log("ok");
+            const token = jwt.sign(
+              {
+                user: {
+                  name: user.username,
+                  role: user.isAdmin === true ? "admin" : "user",
+                },
+              },
+              "my_secret_key",
+              {
+                expiresIn: "30m",
+              }
+            );
+            console.log(token);
+            res.cookie("jwt", token, { httpOnly: true });
+            if (user.isAdmin === true) {
+              console.log("zo admin");
+              return res.redirect("/users/dashboard");}
+            else { return res.redirect("/"); }
+          } else {
+            req.flash("error_msg", "Password is incorrect!");
+            return res.redirect("/users/login");
+          }
+        });
+      })
+      .catch((err) => console.log(err));
+  }
+  logout(req, res, next) {
+    res.clearCookie("jwt");
+    req.flash("success_msg","you are logged out")
+    res.redirect("/");
+  }
 }
-
-// app.post('/login', (req, res, next) => {
-//     passport.authenticate('local', { session: false }, (err, user, info) => {
-//         if (err) {
-//             return next(err);
-//         }
-//         if (!user) {
-//             req.flash('error', 'Invalid username or password');
-//             return res.redirect('/login');
-//         }
-//         const token = jwt.sign({ username: user.username }, 'your_secret_key');
-//         res.cookie('jwt', token, { httpOnly: true });
-//         res.redirect('/protected');
-//     })(req, res, next);
-// });
-// app.get('/protected', jwtAuth, (req, res) => {
-//   res.render('protected', { user: req.user });
-// });
-// app.get('/logout', (req, res) => {
-//   res.clearCookie('jwt');
-//   req.logout();
-//   res.redirect('/');
-// });
-
-// file ejs
-// <script>
-//     const token = '<%= req.cookies.jwt %>';
-//     const headers = new Headers();
-//     headers.append('Authorization', `Bearer ${token}`);
-//     fetch('/api/data', { headers })
-//         .then(response => response.json())
-//         .then(data => console.log(data))
-//         .catch(error => console.error(error));
-// </script>
 module.exports = new userController();

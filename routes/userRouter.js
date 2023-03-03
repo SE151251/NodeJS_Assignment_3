@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const userController = require('../controllers/userController')
 const userRouter = express.Router();
-const {ensureAuthenticated} = require('../config/auth')
+const {ensureAuthenticated, jwtAuth} = require('../config/auth')
 const {redirectLogin} = require('../config/redirectLogin')
 
 userRouter.use(bodyParser.json())
@@ -11,13 +11,13 @@ userRouter.route('/')
  .post(userController.regist)
 userRouter.route('/login')
  .get(userController.login)
- .post(userController.signin)
+ .post(userController.loginJWT)
  userRouter.route('/logout')
- .get(userController.signout)
+ .get(userController.logout)
  userRouter.route('/dashboard')
-  .get(ensureAuthenticated,redirectLogin,userController.dashboard)
+  .get(jwtAuth,userController.dashboard)
   userRouter.route('/edit')
-  .get(ensureAuthenticated,userController.formEdit)
-  .post(ensureAuthenticated,userController.edit)
+  .get(jwtAuth,userController.formEdit)
+  .post(jwtAuth,userController.edit)
 module.exports = userRouter;
 
