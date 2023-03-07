@@ -1,153 +1,86 @@
 <!DOCTYPE html>
-<!-- Designined by CodingLab | www.youtube.com/codinglabyt -->
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <!--<title> Responsiive Admin Dashboard | CodingLab </title>-->
-    <link rel="stylesheet" href="/stylesheets/admin.css">
-    <!-- Boxicons CDN Link -->
-    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.css">
-    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.5.1.js"></script>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript" charset="utf8"
-        src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.js"></script>
-    <script src="https://kit.fontawesome.com/589ebc73ef.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/js/bulma.min.js"
-        integrity="sha512-XSL8md+KzAg/ysd1EBcvzQx+8keNkzJ1pogDe+bJN9P5/RW+5c5v5d6Am++F6fmnt8wpD22fCaC/MP1M48hRtg=="
-        crossorigin="anonymous"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
+<html lang="en">
+<%- include ('./patials/head') %>
 <body>
-    <div class="sidebar">
-        <div class="logo-details">
-            <div class="logo-details">
-                <i class='bx bx-menu sidebarBtn'></i>
-                <span>Dashboard</span>
+    <h1 class="tag is-danger" style="margin-top: 55px;font-size: 36px;font-weight: 900;margin-bottom: 20px;display: flex; justify-content: center; align-items: center">Dashboard Page</h1>
+    <div style="display: flex; justify-content: space-around;">
+        <div class="card" style="width: 30vw">
+            <div class="card-image">
+              <figure class="image is-4by3">
+                <img src="https://anhdepfree.com/wp-content/uploads/2022/12/anh-nen-messi-4k-dep-nhat-cho-may-tinh_49365439418.jpg" alt="Placeholder image">
+              </figure>
             </div>
-        </div>
-        <ul class="nav-links">
-            <li>
-                <a href="#" class="active">
-                    <i class='bx bx-grid-alt'></i>
-                    <span class="links_name">Dashboard</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bx-box'></i>
-                    <span class="links_name">Player</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class='bx bx-list-ul'></i>
-                    <span class="links_name">Nation</span>
-                </a>
-            </li>
-        </ul>
+            <div class="card-content">
+              <div class="media">
+                <div class="media-left">
+                  <figure class="image is-48x48">
+                    <img src="https://avatars.githubusercontent.com/u/105298209?v=4" alt="Placeholder image">
+                  </figure>
+                </div>
+                <div class="media-content">
+                  <p class="title is-4">Total Captain Players</p>
+                  <p class="subtitle is-6"style="font-weight: bold;" ><%= captainPlayers %></p>
+                </div>
+              </div>
+          
+              <div class="content">
+                Toàn các huyền thoại bóng đá với những pha mãn nhãn và tậu về vinh quang cho đất nước
+              </div>
+            </div>
+          </div>
+          <!-- ------------ -->
+          <div class="card" style="width: 30vw;">
+            <div class="card-image">
+              <figure class="image is-4by3">
+                <img src="https://cdn.bongdaplus.vn/Assets/Media/2020/10/23/56/ho-tan-tai-0.jpg" alt="Placeholder image">
+              </figure>
+            </div>
+            <div class="card-content">
+              <div class="media">
+                <div class="media-left">
+                  <figure class="image is-48x48">
+                    <img src="https://avatars.githubusercontent.com/u/105298209?v=4" alt="Placeholder image">
+                  </figure>
+                </div>
+                <div class="media-content">
+                  <p class="title is-4">Total non-Captain players</p>
+                  <p class="subtitle is-6" style="font-weight: bold;"><%= nonCaptain %></p>
+                </div>
+              </div>
+          
+              <div class="content" >
+                Tuổi trẻ là tuổi xông pha và mang tiền về cho mẹ. Mặc dù không phải là catain nhưng vẫn cống hiến hết mình
+              </div>
+            </div>
+          </div>
+          <!-- --------- -->
+          <div class="card" style="width: 30vw;">
+            <div class="card-image">
+              <figure class="image is-4by3">
+                <img src="https://media.istockphoto.com/id/1180987693/vi/anh/h%C3%ACnh-%E1%BA%A3nh-c%E1%BB%A7a-ng%C6%B0%E1%BB%9Di-ph%E1%BB%A5-n%E1%BB%AF-vui-nh%E1%BB%99n-c%E1%BA%A7m-qu%E1%BA%A3-b%C3%B3ng-%C4%91%C3%A1-da-m%C3%A0u-tr%E1%BA%AFng-l%E1%BB%9Bn-m%C3%A0u-%C4%91en-h%E1%BB%97-tr%E1%BB%A3-%C4%91%E1%BB%99i-y%C3%AAu.jpg?s=1024x1024&w=is&k=20&c=q2qO-4swpU6j3VTSNFb0T4-qpOlppudbNj9bbAtRrgk=" alt="Placeholder image">
+              </figure>
+            </div>
+            <div class="card-content">
+              <div class="media">
+                <div class="media-left">
+                  <figure class="image is-48x48">
+                    <img src="https://avatars.githubusercontent.com/u/105298209?v=4" alt="Placeholder image">
+                  </figure>
+                </div>
+                <div class="media-content">
+                  <p class="title is-4">Total Users</p>
+                  <p class="subtitle is-6" style="font-weight: bold;"><%= totalUsers %></p>
+                </div>
+              </div>
+          
+              <div class="content">
+                Bạn là người đam mê bóng đá ? Bạn không biết về các cầu thủ ?
+                Hãy để chúng tôi giúp bạn - Web bóng đá uy tín hàng đầu đến từ Châu Á.
+                Nơi tổng hợp các users "nghiện" à nhầm "Love" bóng đá với niềm đam mê mãnh liệt.
+              </div>
+            </div>
+          </div>
     </div>
-    <section class="home-section">
-        <nav>
-
-            <!-- <div class="profile-details"> -->
-            <div class="navbar-item has-dropdown is-hoverable">
-                <a class="navbar-link">
-                    More
-                </a>
-
-                <div class="navbar-dropdown">
-                    <a class="navbar-item">
-                        Profile
-                    </a>
-                    <a class="navbar-item">
-                        Logout
-                    </a>
-                </div>
-            </div>
-            <!-- </div> -->
-        </nav>
-        <div class="home-content">
-            <div class="overview-boxes">
-                <div class="box">
-                    <div class="right-side">
-                        <div class="box-topic">Captain Player</div>
-                        <div>40,876</div>
-                    </div>
-                    <i class='bx bx-cart-alt cart'></i>
-                </div>
-                <div class="box">
-                    <div class="right-side">
-                        <div class="box-topic">Total Player</div>
-                        <div>38,876</div>
-
-                    </div>
-                    <i class='bx bxs-cart-add cart two'></i>
-                </div>
-                <div class="box">
-                    <div class="right-side">
-                        <div class="box-topic">Total User</div>
-                        <div>38,876</div>
-                    </div>
-                    <i class='bx bxs-cart-add cart two'></i>
-                </div>
-            </div>
-
-        </div>
-        <div>
-            <div id="chart_div"></div>
-              
-
-        </div>
-    </section>
-
-    <script>
-        let sidebar = document.querySelector(".sidebar");
-        let sidebarBtn = document.querySelector(".sidebarBtn");
-        sidebarBtn.onclick = function () {
-            sidebar.classList.toggle("active");
-            if (sidebar.classList.contains("active")) {
-                sidebarBtn.classList.replace("bx-menu", "bx-menu-alt-right");
-            } else
-                sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-        }
-        // Load the Visualization API and the piechart package.
-      google.load('visualization', '1.0', {'packages':['corechart']});
-      google.setOnLoadCallback(drawChart);
-
-      function drawChart() {
-
-        // Create the data table.
-        var data = new google.visualization.DataTable();
-        // Create columns for the DataTable
-        data.addColumn('string');
-        data.addColumn('number', 'Devices');
-        // Create Rows with data
-        data.addRows([
-          ['SamSung', 21],
-          ['Apple', 14],
-          ['Huawei', 9],
-          ['LG', 4],
-          ['Xiaomi', 5],
-          ['ZTE', 5],
-          ['Other', 42]
-        ]);
-		//Create option for chart
-        var options = {
-          title: 'Global smartphone share Q2 2015',
-          'width': 1800,
-          'height': 600
-        };
-
-        // Instantiate and draw our chart, passing in some options.
-        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-      }
-
-    </script>
-
 </body>
-
+<%- include ('./patials/footer') %>
 </html>

@@ -1,6 +1,7 @@
 const Players = require("../model/player");
 const Nations = require("../model/nation");
-
+const Users = require("../model/user");
+const jwt = require("jsonwebtoken");
 let clubData = [
   { id: "1", name: "Arsenal" },
   { id: "2", name: "Manchester United" },
@@ -24,8 +25,13 @@ let postitionData = [
 ];
 class PlayerController {
   home(req, res, next) {
-    console.log(req.session);
-    Nations.find({})
+    if(req.cookies.jwt){
+      jwt.verify(req.cookies.jwt, 'my_secret_key', (err, decoded) => {
+        console.log(decoded);
+        if (err) {
+          req.name = undefined;
+          req.role = undefined;
+          Nations.find({})
       .then((nations) => {
         Players.find({ isCaptain: true })
           .populate("nation", ["name", "description"])
@@ -36,7 +42,7 @@ class PlayerController {
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
-              isLogin: req.session.passport === undefined ? false : true,
+              isLogin: {name: req.name, role:req.role}
             });
           })
           .catch((err) => {
@@ -48,6 +54,80 @@ class PlayerController {
         console.log(err);
         next();
       });
+        }else{
+        req.userId = decoded.user.userId;
+        req.name = decoded.user.name;
+        req.role = decoded.user.role;
+        Nations.find({})
+        .then((nations) => {
+          Players.find({ isCaptain: true })
+            .populate("nation", ["name", "description"])
+            .then((players) => {
+              res.render("index", {
+                title: "The list of Players",
+                players: players,
+                positionList: postitionData,
+                clubList: clubData,
+                nationsList: nations,
+                isLogin: {name: req.name, role:req.role}
+              });
+            })
+            .catch((err) => {
+              console.log(err);
+              next();
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          next();
+        });
+        }      
+      });
+    }else{
+    Nations.find({})
+      .then((nations) => {
+        Players.find({ isCaptain: true })
+          .populate("nation", ["name", "description"])
+          .then((players) => {
+            res.render("index", {
+              title: "The list of Players",
+              players: players,
+              positionList: postitionData,
+              clubList: clubData,
+              nationsList: nations,
+              isLogin: {name: req.name, role:req.role}
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            next();
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+        next();
+      });
+    }
+  }
+  dashboard(req, res, next){
+    Promise.all([
+      Players.countDocuments({isCaptain: false}),
+      Players.countDocuments({ isCaptain: true }),
+      Users.countDocuments({})
+     ])
+    .then(([nonCaptain, totalCaptains, totalUsers]) => {
+     res.render('dashboard', {
+      title: "Dashboard",
+      captainPlayers: totalCaptains,
+      nonCaptain: nonCaptain,
+      totalUsers: totalUsers,
+      isLogin: {name: req.name, role:req.role}
+     })
+    })
+    .catch(err => {
+      console.error(err);
+      next()
+    });
   }
   index(req, res, next) {
     Nations.find({})
@@ -61,7 +141,7 @@ class PlayerController {
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
-              isLogin: req.session.passport === undefined ? false : true,
+              isLogin: {name: req.name, role:req.role}
             });
           })
           .catch((err) => {
@@ -83,7 +163,7 @@ class PlayerController {
             "Please input data of nations in Database first!!!"
           );
           return res.redirect("/players");
-        } else {
+        } else {          
           var data = {
             name: req.body.name,
             image:
@@ -130,7 +210,7 @@ class PlayerController {
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
-              isLogin: req.session.passport === undefined ? false : true,
+              isLogin: {name: req.name, role:req.role}
             });
           })
           .catch(next);
@@ -149,7 +229,7 @@ class PlayerController {
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
-              isLogin: req.session.passport === undefined ? false : true,
+              isLogin: {name: req.name, role:req.role}
             });
           })
           .catch(next);

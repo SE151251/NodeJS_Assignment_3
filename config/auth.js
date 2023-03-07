@@ -9,7 +9,6 @@ module.exports = {
            req.flash('error_msg', 'Please log in first!');
            res.redirect('/users/login');
         },
-    
         //with jwt
         jwtAuth: (req, res, next) => {
          const token = req.cookies.jwt;
@@ -21,10 +20,11 @@ module.exports = {
          }
          jwt.verify(token, 'my_secret_key', (err, decoded) => {
            if (err) {
-            req.flash('error_msg', err);
-             return res.redirect('/users/login');
+            console.log(err.message);
+            req.flash('error_msg', err.message);
+            return res.redirect('/users/login');
            }
-           console.log(decoded);
+           req.userId = decoded.user.userId;
            req.name = decoded.user.name;
            req.role = decoded.user.role;
            next();

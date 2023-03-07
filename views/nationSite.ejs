@@ -1,154 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ('./patials/head') %>
+
     <body style=" height: 100vh;">
-        <a style="position: fixed; bottom: 0; right: 0;" onClick="document.querySelector('#popup2').classList.add('is-active')">
-          
+        <h1 class="tag is-danger"
+        style="margin-top: 55px; font-size: 36px;font-weight: 900;margin-bottom: 20px;display: flex; justify-content: center; align-items: center">
+            Nations Page</h1>
+        <a class="button is-primary" style="position: fixed; bottom: 4vh; right: 2vw;"
+            onClick="document.querySelector('#popup2').classList.add('is-active')">
             New Nation
-        </a>  
-        <div style="margin-top: 100px;"><% if(error_msg != ''){ %>
-            <%= error_msg %>
-        <% } %></div>      
-        
-        <!-- Popup -->
-        <div id="popup2" class="modal">
-            <div class="modal-background"></div>
-            <div class="modal-card">
-                <header class="modal-card-head" style="background-color: hsl(171, 100%, 41%);">
-                    <p class="modal-card-title" style="text-align: center; font-weight: 700;"> ADD NEW NATION</p>
-                    <button class="delete" aria-label="close"
-                        onclick="document.querySelector('#popup2').classList.remove('is-active')"></button>
-                </header>
-                <section class="modal-card-body">                   
-                    <form method="post" action="/nations">
-                        <div class="field is-horizontal">
-                            <div class="field-label is-normal">
-                                <label class="label">Nation</label>
-                            </div>
-                            <div class="field-body">
-                                <div class="field">
-                                    <div class="control">
-                                        <input class="input is-info" required name="name" type="text"
-                                            placeholder="e.g. Brazil">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="field is-horizontal">
-                            <div class="field-label is-normal">
-                                <label class="label">Description</label>
-                            </div>
-                            <div class="field-body">
-                                <div class="field">
-                                    <div class="control">
-                                        <input class="input is-info" required name="description" type="text"
-                                            placeholder="Let's description">
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>                  
-                        <div class="field is-horizontal" style="margin-left: 120px;">
-                            <div class="field-body">
-                                <div class="field">
-                                    <div class="control">
-                                        <button class="button is-primary" type="submit" style="font-weight: 700">
-                                            Create
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </section>
+        </a>
+        <% if(error_msg !='' ){ %>
+            <div class="notification is-danger is-light"
+            style="margin-top: 55px;font-size: 36px;font-weight: 900;margin-bottom: 20px;display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px;">
+                <%= error_msg %>
             </div>
-        </div>
-   
-        <!-- table content -->
-        <div class="container is-fluid"
-            style="display:flex; justify-content: center; padding-top: 100px;">
-            <div>
-                <table id="mytable" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth" style="width: 1000px;">
-                    <thead style="height: 40px; background-color: aqua;">
-                        <tr>
-                            <th style="text-align: center;">Nations</th>
-                            <th style="text-align: center;">Description</th>
-                            <th style="text-align: center;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody style="text-align: center">
-                        <% nations.forEach(function(nation) { %>
-                            <tr>
-                                <td style="padding-top: 18px;">
-                                    <%= nation.name %>
-                                </td>
-                                <td style="padding-top: 18px;">
-                                    <%= nation.description %>
-                                </td>
-                                <td style="padding-top: 12px;">
+            <% } %>
 
-                                    <div class="dropdown" style="height: 50px;">
-                                        <div class="dropdown-trigger">
-                                            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu3">
-                                                <span class="icon ">
-                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                                </span>
-                                            </button>
-                                        </div>
-                                        <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                                            <div class="dropdown-content" style="width: 120px">
-                                                <a  class="dropdown-item"
-                                                    href="/nations/edit/<%=nation.id %>"><i class="fa-solid fa-pencil"
-                                                        style="margin-left: 6px; margin-right: 10px;"></i>Edit</a>
-                                                <a  class="dropdown-item"
-                                                    href="/nations/delete/<%=nation.id %>"
-                                                    onclick="return confirm('Are you sure ???')"><i
-                                                        class="fa-solid fa-trash-can"
-                                                        style="margin-left: 6px; margin-right: 10px;"></i>Delete</button></a>
+                <!-- Popup -->
+                <div id="popup2" class="modal">
+                    <div class="modal-background"></div>
+                    <div class="modal-card">
+                        <header class="modal-card-head" style="background-color: hsl(171, 100%, 41%)">
+                            <p class="modal-card-title" style="text-align: center; font-weight: 700;"> ADD NEW NATION
+                            </p>
+                            <button class="delete" aria-label="close"
+                                onclick="document.querySelector('#popup2').classList.remove('is-active')"></button>
+                        </header>
+                        <section class="modal-card-body">
+                            <form method="post" action="/nations">
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">Nation</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="control">
+                                                <input class="input is-info" required name="name" type="text"
+                                                    placeholder="e.g. Brazil">
                                             </div>
                                         </div>
-
                                     </div>
-            </div>
-        </div>
-        </td>
-        </tr>
-        <% }) %>
-            </tbody>
-            </table>
-            </div>
+                                </div>
+                                <div class="field is-horizontal">
+                                    <div class="field-label is-normal">
+                                        <label class="label">Description</label>
+                                    </div>
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="control">
+                                                <!-- <input class="input is-info" required name="description" type="text"
+                                            placeholder="Let's description"> -->
+                                                <textarea class="textarea" placeholder="Let's description"
+                                                    name="description"></textarea>
+                                            </div>
 
-            </div>
-            <!-- popup -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field is-horizontal" style="margin-left: 120px;">
+                                    <div class="field-body">
+                                        <div class="field">
+                                            <div class="control">
+                                                <button class="button is-primary" type="submit"
+                                                    style="font-weight: 700">
+                                                    Create
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- table content -->
+                <div class="container is-fluid" style="display:flex; justify-content: center;">
+                    <div>
+                        <table id="mytable" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+                            style="width: 1000px;">
+                            <thead style="height: 40px; background-color: aqua;">
+                                <tr>
+                                    <th style="text-align: center;">Nation Name</th>
+                                    <th style="text-align: center;">Image</th>
+                                    <th style="text-align: center;">Description</th>
+                                    <th style="text-align: center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody style="text-align: center">
+                                <% nations.forEach(function(nation) { %>
+                                    <tr>
+                                        <td style="padding-top: 18px;">
+                                            <%= nation.name %>
+                                        </td>
+                                        <td style="padding: 10px;">
+                                            <figure style="height: 46px">
+                                                <img src= "https://cloudinary.fifa.com/api/v3/picture/flags-sq-2/<%=nation.name.slice(0, 3).toUpperCase()%>?tx=c_fill,g_auto,q_auto,w_70,h_46" alt="Placeholder image">
+                                              </figure>
+                                        </td>
+                                        <td style="padding-top: 18px;">
+                                            <%= nation.description %>
+                                        </td>
+                                        <td
+                                            style="padding-top: 20px;">
+                                            <div class="navbar-item has-dropdown is-hoverable" style="width: 10px;">
+                                                <span class="icon" style="padding-left: 80px">
+                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                </span>
+                                                <div class="navbar-dropdown">
+                                                    <a class="navbar-item" href="/nations/edit/<%=nation.id %>"><i
+                                                            class="fa-solid fa-pencil"
+                                                            style="margin-left: 6px; margin-right: 10px;"></i>Edit</a>
+                                                    <a class="navbar-item" href="/nations/delete/<%=nation.id %>"
+                                                        onclick="return confirm('Are you sure ???')"><i
+                                                            class="fa-solid fa-trash-can"
+                                                            style="margin-left: 6px; margin-right: 10px;"></i>Delete</button></a>
+
+                                                </div>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <!-- popup -->
 
     </body>
     <script>
-         $(document).ready(function () {
+        $(document).ready(function () {
             $('#mytable').DataTable();
         });
-            document.addEventListener('DOMContentLoaded', function () {
-                // Get all "dropdown" elements
-                var dropdowns = Array.prototype.slice.call(document.querySelectorAll('.dropdown'), 0);
+        document.addEventListener('DOMContentLoaded', function () {
+            // Get all "dropdown" elements
+            var dropdowns = Array.prototype.slice.call(document.querySelectorAll('.dropdown'), 0);
 
-                // Loop through all dropdowns and bind click event
+            // Loop through all dropdowns and bind click event
+            dropdowns.forEach(function (dropdown) {
+                dropdown.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    dropdown.classList.toggle('is-active');
+                });
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function (event) {
+                closeDropdowns();
+            });
+
+            function closeDropdowns() {
                 dropdowns.forEach(function (dropdown) {
-                    dropdown.addEventListener('click', function (event) {
-                        event.stopPropagation();
-                        dropdown.classList.toggle('is-active');
-                    });
+                    dropdown.classList.remove('is-active');
                 });
-
-                // Close dropdowns when clicking outside
-                document.addEventListener('click', function (event) {
-                    closeDropdowns();
-                });
-
-                function closeDropdowns() {
-                    dropdowns.forEach(function (dropdown) {
-                        dropdown.classList.remove('is-active');
-                    });
-                }
-            });       
+            }
+        });       
     </script>
 
 </html>

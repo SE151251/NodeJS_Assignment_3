@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <%- include ('./patials/head') %>
-
     <body>
         <h1 style="text-align: center; margin-top: 100px; font-size: 40px; font-weight: 500; margin-bottom: 20px;">
-            UPDATE NATION</h1>
+            MY PROFILE</h1>
         <div style="margin-top: 100px;">
             <% if(error_msg !='' ){ %>
                 <%= error_msg %>
@@ -14,6 +13,21 @@
                                 <% } %>
         </div>
         <form method="post" class="container is-max-desktop" style="margin-top: 10px;">
+            <div class="field is-horizontal" style="margin-bottom: 30px;">
+                <div class="field-label is-normal">
+                    <label class="label">User Name</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <div class="control">
+                            <input class="input is-info" name="username" type="text" disabled value="<%= user.username %>">
+                        </div>
+                        <!-- <p class="help is-danger">
+                        This field is required
+                    </p> -->
+                    </div>
+                </div>
+            </div>
             <div class="field is-horizontal" style="margin-bottom: 30px;">
                 <div class="field-label is-normal">
                     <label class="label">Name</label>
@@ -53,7 +67,7 @@
                     <div class="field">
                         <div class="control">
                             <button class="button is-primary" type="submit" style="margin-left: 180px;">
-                                Save
+                                UPDATE
                             </button>
                         </div>
                     </div>

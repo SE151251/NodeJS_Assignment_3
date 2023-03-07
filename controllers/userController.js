@@ -12,7 +12,7 @@ class userController {
         res.render("accounts", {
           title: "The list of Users",
           users: users,
-          isLogin: req.session.passport === undefined ? false : true,
+          isLogin: { name: req.name, role: req.role },
         });
       })
       .catch(next);
@@ -64,7 +64,22 @@ class userController {
   }
 
   login(req, res, next) {
-    res.render("login");
+    console.log(req.cookies.jwt);
+    if (req.cookies.jwt) {
+      const token = req.cookies.jwt;
+      jwt.verify(token, "my_secret_key", (err, decoded) => {
+        if (err) {
+          req.flash('error_msg', err.message);
+          return res.render("login");
+        } else {
+          if (decoded.user.role === "admin")
+          return res.redirect("/users/dashboard");
+          else return res.redirect("/");
+        }
+      });
+    } else {
+      return res.render("login");
+    }
   }
   signin(req, res, next) {
     passport.authenticate("local", {
@@ -75,8 +90,10 @@ class userController {
   }
 
   dashboard(req, res, next) {
-    
-    res.render("dashboard",{title: "Dashboard", isLogin: req.session.passport === undefined ? false : true,})
+    res.render("dashboard", {
+      title: "Dashboard",
+      isLogin: { name: req.name, role: req.role },
+    });
   }
   signout(req, res, next) {
     req.logout(function (err) {
@@ -91,7 +108,7 @@ class userController {
 
   //update user
   formEdit(req, res, next) {
-    const userId = req.session.passport.user.id;
+    const userId = req.userId;
     console.log(userId);
     User.findById(userId)
       .then((user) => {
@@ -99,7 +116,7 @@ class userController {
         res.render("profile", {
           title: "The detail of User",
           user: user,
-          isLogin: req.session.passport === undefined ? false : true,
+          isLogin: { name: req.name, role: req.role },
         });
       })
       .catch((err) => {
@@ -111,7 +128,7 @@ class userController {
       name: req.body.name,
       YOB: req.body.yob,
     };
-    User.updateOne({ _id: req.session.passport.user.id }, data)
+    User.updateOne({ _id: req.userId }, data)
       .then(() => {
         req.flash("success_msg", "Updated successfully!");
         res.redirect(`/users/edit`);
@@ -134,11 +151,12 @@ class userController {
         bcrypt.compare(password, user.password, (err, isMatch) => {
           if (err) throw err;
           if (isMatch) {
-            console.log("ok");
+            console.log(user);
             const token = jwt.sign(
               {
                 user: {
-                  name: user.username,
+                  userId: user._id.toString(),
+                  name: user.name,
                   role: user.isAdmin === true ? "admin" : "user",
                 },
               },
@@ -147,12 +165,17 @@ class userController {
                 expiresIn: "30m",
               }
             );
-            console.log(token);
-            res.cookie("jwt", token, { httpOnly: true });
+            res.cookie("jwt", token, {
+              httpOnly: true,
+              secure: true,
+              maxAge: 24 * 60 * 60 * 1000,
+            });
             if (user.isAdmin === true) {
               console.log("zo admin");
-              return res.redirect("/users/dashboard");}
-            else { return res.redirect("/"); }
+              return res.redirect("/users/dashboard");
+            } else {
+              return res.redirect("/");
+            }
           } else {
             req.flash("error_msg", "Password is incorrect!");
             return res.redirect("/users/login");
@@ -163,7 +186,7 @@ class userController {
   }
   logout(req, res, next) {
     res.clearCookie("jwt");
-    req.flash("success_msg","you are logged out")
+    req.flash("success_msg", "You are logged out");
     res.redirect("/");
   }
 }
