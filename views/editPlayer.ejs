@@ -30,7 +30,7 @@
             <div class="field-body">
                 <div class="field">
                     <div class="control">
-                        <div><figure style="width: 48px; height: 72px;">
+                        <div><figure style="width: 96px; height: 144px;">
                             <img  src="<%=player.image%>">
                           </figure></div>
                         <div class="file has-name is-boxed">
@@ -118,8 +118,8 @@
                     <div class="control">
                         <div class="select is-fullwidth">
                             <select name="nation">
-                                <%for (let nation of nationsList){ %>
-                                    <option value="<%= nation._id %>">
+                                <%for (let nation of nationsList){ %>                                 
+                                    <option value="<%= nation._id %>" <%=JSON.stringify(nation.name)===JSON.stringify(player.nation.name) ? 'selected' : '' %>>
                                         <%= nation.name %>
                                     </option>
                                     <% } %>

@@ -13,24 +13,24 @@
                     Information
                   </div>
                 <div class="card">
-                    <div class="card-content">                
+                    <div class="card-content" style="line-height: 40px;">                
                       <div class="content">
-                        Name: <%= player.name %>                                                                
+                       <strong>Name</strong> : <%= player.name %>                                                                
                       </div>
                       <div class="content">
-                        Career: <%= player.name %>                                                                
+                        <strong>Career</strong>: <%= player.career %>                                                                
                       </div>
                       <div class="content">
-                        Position: <%= player.name %>                                                                
+                        <strong>Position</strong> : <%= player.position %>                                                                
                       </div>
                       <div class="content">
-                        Goals: <%= player.name %>                                                                
+                        <strong>Goals</strong>: <%= player.goals %>                                                                
                       </div>
                       <div class="content">
-                        Nation: <%= player.nation.name %>                                                                
+                        <strong>Nation</strong>: <%= player.nation.name %>                                                                
                       </div>
                       <div class="content">
-                        Captain: <%=player.isCaptain===true ? 'Yes' : 'No' %>                                                                
+                       <strong>Captain</strong> : <%=player.isCaptain===true ? 'Yes' : 'No' %>                                                                
                       </div>
                     </div>
                   </div>
@@ -39,6 +39,4 @@
           </div>                                
                              
     </body>
-
-
 </html>

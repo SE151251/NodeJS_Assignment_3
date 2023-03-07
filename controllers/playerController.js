@@ -27,7 +27,6 @@ class PlayerController {
   home(req, res, next) {
     if(req.cookies.jwt){
       jwt.verify(req.cookies.jwt, 'my_secret_key', (err, decoded) => {
-        console.log(decoded);
         if (err) {
           req.name = undefined;
           req.role = undefined;
@@ -199,29 +198,77 @@ class PlayerController {
   }
   playerDetail(req, res, next) {
     const playerId = req.params.playerId;
-    Nations.find({})
-      .then((nations) => {
-        Players.findById(playerId)
-          .populate("nation", "name")
-          .then((player) => {
-            res.render("playerDetail", {
-              title: "The detail of Player",
-              player: player,
-              positionList: postitionData,
-              clubList: clubData,
-              nationsList: nations,
-              isLogin: {name: req.name, role:req.role}
-            });
+      if(req.cookies.jwt){
+        jwt.verify(req.cookies.jwt, 'my_secret_key', (err, decoded) => {
+          if (err) {
+            req.name = undefined;
+            req.role = undefined;
+            Nations.find({})
+            .then((nations) => {
+              Players.findById(playerId)
+                .populate("nation", "name")
+                .then((player) => {
+                  res.render("playerDetail", {
+                    title: "The detail of Player",
+                    player: player,
+                    positionList: postitionData,
+                    clubList: clubData,
+                    nationsList: nations,
+                    isLogin: {name: req.name, role:req.role}
+                  });
+                })
+                .catch(next);
+            })
+            .catch(next);
+          }else{
+          req.userId = decoded.user.userId;
+          req.name = decoded.user.name;
+          req.role = decoded.user.role;
+          Nations.find({})
+          .then((nations) => {
+            Players.findById(playerId)
+              .populate("nation", "name")
+              .then((player) => {
+                res.render("playerDetail", {
+                  title: "The detail of Player",
+                  player: player,
+                  positionList: postitionData,
+                  clubList: clubData,
+                  nationsList: nations,
+                  isLogin: {name: req.name, role:req.role}
+                });
+              })
+              .catch(next);
           })
           .catch(next);
-      })
-      .catch(next);
+          }      
+        });
+      }else{
+        Nations.find({})
+        .then((nations) => {
+          Players.findById(playerId)
+            .populate("nation", "name")
+            .then((player) => {
+              res.render("playerDetail", {
+                title: "The detail of Player",
+                player: player,
+                positionList: postitionData,
+                clubList: clubData,
+                nationsList: nations,
+                isLogin: {name: req.name, role:req.role}
+              });
+            })
+            .catch(next);
+        })
+        .catch(next);
+      }
+
   }
   formEdit(req, res, next) {
     const playerId = req.params.playerId;
     Nations.find({})
       .then((nations) => {
-        Players.findById(playerId)
+        Players.findById(playerId).populate("nation", "name")
           .then((player) => {
             res.render("editPlayer", {
               title: "The detail of Player",
