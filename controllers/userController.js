@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("../model/user");
 var passport = require("passport");
-var jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 class userController {
   index(req, res, next) {
     res.render("register");
@@ -64,7 +64,6 @@ class userController {
   }
 
   login(req, res, next) {
-    console.log(req.cookies.jwt);
     if (req.cookies.jwt) {
       const token = req.cookies.jwt;
       jwt.verify(token, "my_secret_key", (err, decoded) => {
@@ -130,6 +129,39 @@ class userController {
     };
     User.updateOne({ _id: req.userId }, data)
       .then(() => {
+        try {
+          const decodedToken = jwt.verify(req.cookies.jwt, 'my_secret_key');        
+          const now = Math.floor(Date.now() / 1000);
+          console.log(decodedToken);
+            const expiresIn = decodedToken.exp - now;
+            console.log(`JWT will expire in ${expiresIn} seconds`); 
+            console.log(`${expiresIn}s`);
+            const new_token = jwt.sign(
+              {
+                user: {
+                  userId: decodedToken.user.userId,
+                  name: req.body.name,
+                  role: decodedToken.user.role,
+                },
+              },
+              "my_secret_key",
+              {
+                expiresIn: `${expiresIn}s`,
+              }
+            );
+            const decodedToken2 = jwt.verify(new_token, 'my_secret_key');        
+            console.log("2 : ",decodedToken2);
+            const expiresIn2 = decodedToken.exp - now;
+            console.log(`JWT will expire in ${expiresIn2} seconds`); 
+            res.clearCookie("jwt");
+            res.cookie("jwt", new_token, {
+              httpOnly: true,
+              secure: true,
+              maxAge: 24 * 60 * 60 * 1000,
+            });        
+        } catch (err) {
+          console.error('Failed to verify JWT', err);
+        }
         req.flash("success_msg", "Updated successfully!");
         res.redirect(`/users/edit`);
       })
@@ -151,7 +183,6 @@ class userController {
         bcrypt.compare(password, user.password, (err, isMatch) => {
           if (err) throw err;
           if (isMatch) {
-            console.log(user);
             const token = jwt.sign(
               {
                 user: {
@@ -162,7 +193,7 @@ class userController {
               },
               "my_secret_key",
               {
-                expiresIn: "30m",
+                expiresIn: "5s",
               }
             );
             res.cookie("jwt", token, {

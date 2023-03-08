@@ -30,9 +30,9 @@
             <div class="field-body">
                 <div class="field">
                     <div class="control">
-                        <div><figure style="width: 96px; height: 144px;">
+                        <!-- <div><figure style="width: 96px; height: 144px;">
                             <img  src="<%=player.image%>">
-                          </figure></div>
+                          </figure></div> -->
                         <div class="file has-name is-boxed">
                             <label class="file-label">
                                 <input class="file-input" type="file" name="file">
@@ -54,28 +54,8 @@
                 </div>
             </div>
         </div>
-        <div class="field is-horizontal">
-            <div class="field-label is-normal">
-                <label class="label">Career</label>
-            </div>
-            <div class="field-body">
-                <div class="field is-narrow">
-                    <div class="control">
-                        <div class="select is-fullwidth">
-                            <select name="career">
-                                <%for (let club of clubList){ %>
-                                    <option value="<%= club.name %>"
-                                        <%=JSON.stringify(club.name)===JSON.stringify(player.career) ? 'selected' : '' %>><%=
-                                            club.name %>
-                                    </option>
-                                    <% } %>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    
+   
+    <div style="display: flex; align-items: center; justify-content: space-around; width: 60vw; margin-left: 6vw;">
         <div class="field is-horizontal">
             <div class="field-label is-normal">
                 <label class="label">Position</label>
@@ -102,7 +82,7 @@
                 <label class="label">Goals</label>
             </div>
             <div class="field-body">
-                <div class="field">
+                <div class="field is-narrow">
                     <div class="control">
                         <input class="input is-info" name="goals" required min="0" type="number" value="<%= player.goals %>">
                     </div>                    
@@ -129,6 +109,31 @@
                 </div>
             </div>
         </div>
+
+    </div>
+    <div class="field is-horizontal">
+        <div class="field-label is-normal">
+            <label class="label">Career</label>
+        </div>
+        <div class="field-body">
+            <div class="field">
+                <div class="control">
+                    <!-- <div class="select is-fullwidth">
+                        <select name="career">
+                            <%for (let club of clubList){ %>
+                                <option value="<%= club.name %>"
+                                    <%=JSON.stringify(club.name)===JSON.stringify(player.career) ? 'selected' : '' %>><%=
+                                        club.name %>
+                                </option>
+                                <% } %>
+                        </select>
+                    </div> -->
+                    <textarea class="textarea" placeholder="Let's career"
+                    name="career"><%= player.career %></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
         <div class="field is-horizontal" style="display: flex; justify-content: center; align-items: center;">
             <div class="field-label is-normal">
               <label class="label" style="padding-bottom: 10px;">isCaptain</label>

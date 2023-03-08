@@ -13,7 +13,11 @@ class NationController {
       .catch(next);
   }
   create(req, res, next) {
-    const nation = new Nations(req.body);
+    const dataNew = {
+      name: req.body.name.trim(),
+      description: req.body.description.trim(),
+    }
+    const nation = new Nations(dataNew);
     Nations.find({ name: nation.name }).then((nationCheck) => {
       if (nationCheck.length > 0) {
         req.flash("error_msg", "Duplicate nation name!");
@@ -39,7 +43,11 @@ class NationController {
       .catch(next);
   }
   edit(req, res, next) {
-    Nations.updateOne({ _id: req.params.nationId }, req.body)
+    const dataNew = {
+      name: req.body.name.trim(),
+      description: req.body.description.trim(),
+    }
+    Nations.updateOne({ _id: req.params.nationId }, dataNew)
       .then(() => {
         return res.redirect("/nations");
       })

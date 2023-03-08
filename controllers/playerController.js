@@ -110,15 +110,15 @@ class PlayerController {
   }
   dashboard(req, res, next){
     Promise.all([
-      Players.countDocuments({isCaptain: false}),
-      Players.countDocuments({ isCaptain: true }),
+      Players.countDocuments({}),
+      Nations.countDocuments({}),
       Users.countDocuments({})
      ])
-    .then(([nonCaptain, totalCaptains, totalUsers]) => {
+    .then(([totalPlayers, totalNations, totalUsers]) => {
      res.render('dashboard', {
       title: "Dashboard",
-      captainPlayers: totalCaptains,
-      nonCaptain: nonCaptain,
+      totalNations: totalNations,
+      totalPlayers: totalPlayers,
       totalUsers: totalUsers,
       isLogin: {name: req.name, role:req.role}
      })
@@ -175,14 +175,12 @@ class PlayerController {
             nation: req.body.nation,
             isCaptain: req.body.isCaptain === undefined ? false : true,
           };
-          console.log("data: ", data);
           const player = new Players(data);
           Players.find({ name: player.name }).then((playerCheck) => {
             if (playerCheck.length > 0) {
               req.flash("error_msg", "Duplicate player name!");
               res.redirect("/players");
             } else {
-              console.log(player);
               player
                 .save()
                 .then(() => res.redirect("/players"))
