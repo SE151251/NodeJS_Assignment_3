@@ -303,15 +303,23 @@ class PlayerController {
         isCaptain: req.body.isCaptain === undefined ? false : true,
       };
     }
-    Players.updateOne({ _id: req.params.playerId }, data)
-      .then(() => {
-        res.redirect("/players");
-      })
-      .catch((err) => {
-        console.log("error update: ", err);
+    Players.find({ name: req.body.name }).then((playerCheck) => {
+      if (playerCheck.length > 0) {
         req.flash("error_msg", "Duplicate player name!");
-        res.redirect(`/players/edit/${req.params.playerId}`);
-      });
+        return res.redirect("/players");
+      } else {
+        Players.updateOne({ _id: req.params.playerId }, data)
+        .then(() => {
+          res.redirect("/players");
+        })
+        .catch((err) => {
+          console.log("error update: ", err);
+          req.flash("error_msg", "Duplicate player name!");
+          res.redirect(`/players/edit/${req.params.playerId}`);
+        });
+      }
+    });
+
   }
   delete(req, res, next) {
     Players.findByIdAndDelete({ _id: req.params.playerId })
