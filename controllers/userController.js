@@ -62,17 +62,88 @@ class userController {
       });
     }
   }
-
+  changePasswordIndex(req, res, next) {
+    res.render("changePassword", {
+      title: "Dashboard",
+      isLogin: { name: req.name, role: req.role },
+    });
+  }
+  changePasswordHandle(req, res, next) {
+    const currentPassword = req.body.currentPassword;
+    const newPassword = req.body.newPassword;
+    const confirmPassword = req.body.confirmPassword;
+    if (currentPassword.length < 6) {
+      req.flash("error_msg", "Current password must be at least 6 characters!");
+      return res.redirect("/users/change-password");
+    }
+    if (newPassword.length < 6) {
+      req.flash("error_msg", "New password must be at least 6 characters!");
+      return res.redirect("/users/change-password");
+    }
+    if (confirmPassword.length < 6) {
+      req.flash("error_msg", "Confirm password must be at least 6 characters!");
+      return res.redirect("/users/change-password");
+    }
+    if (currentPassword === newPassword) {
+      req.flash(
+        "error_msg",
+        "Current password is duplicated with New Password!"
+      );
+      return res.redirect("/users/change-password");
+    }
+    if (newPassword !== confirmPassword) {
+      req.flash("error_msg", "Confirm Password not match with New Password!");
+      return res.redirect("/users/change-password");
+    }
+    User.findById(req.userId)
+      .then((user) => {
+        //Check password
+        bcrypt.compare(currentPassword, user.password, (err, isMatch) => {
+          if (err) {
+            console.log(err);
+            req.flash("error_msg", "Error compare password!");
+            return res.redirect("/users/change-password");
+          }
+          if (isMatch) {
+            bcrypt.hash(newPassword, 10, function (err, hash) {
+              if (err) {
+                console.log(err);
+                req.flash("error_msg", "Hash password failed!");
+                return res.redirect("/users/change-password");
+              }
+              User.findByIdAndUpdate({ _id: req.userId }, { password: hash })
+                .then(() => {
+                  res.clearCookie("jwt");
+                  req.flash("success_msg", "Update password successfully!");
+                  res.redirect("/");
+                })
+                .catch((err) => {
+                  console.log(err);
+                  req.flash("error_msg", "Update failed!");
+                  return res.redirect("/users/change-password");
+                });
+            });
+          } else {
+            req.flash("error_msg", "Current password is incorrect!");
+            return res.redirect("/users/change-password");
+          }
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.redirect("/users/change-password");
+      });
+  }
   login(req, res, next) {
     if (req.cookies.jwt) {
       const token = req.cookies.jwt;
       jwt.verify(token, "my_secret_key", (err, decoded) => {
         if (err) {
-          req.flash('error_msg', err.message);
+          req.flash("error_msg", err.message);
           return res.render("login");
         } else {
           if (decoded.user.role === "admin")
-          return res.redirect("/users/dashboard");
+            return res.redirect("/users/dashboard");
           else return res.redirect("/");
         }
       });
@@ -130,37 +201,37 @@ class userController {
     User.updateOne({ _id: req.userId }, data)
       .then(() => {
         try {
-          const decodedToken = jwt.verify(req.cookies.jwt, 'my_secret_key');        
+          const decodedToken = jwt.verify(req.cookies.jwt, "my_secret_key");
           const now = Math.floor(Date.now() / 1000);
           console.log(decodedToken);
-            const expiresIn = decodedToken.exp - now;
-            console.log(`JWT will expire in ${expiresIn} seconds`); 
-            console.log(`${expiresIn}s`);
-            const new_token = jwt.sign(
-              {
-                user: {
-                  userId: decodedToken.user.userId,
-                  name: req.body.name,
-                  role: decodedToken.user.role,
-                },
+          const expiresIn = decodedToken.exp - now;
+          console.log(`JWT will expire in ${expiresIn} seconds`);
+          console.log(`${expiresIn}s`);
+          const new_token = jwt.sign(
+            {
+              user: {
+                userId: decodedToken.user.userId,
+                name: req.body.name,
+                role: decodedToken.user.role,
               },
-              "my_secret_key",
-              {
-                expiresIn: `${expiresIn}s`,
-              }
-            );
-            const decodedToken2 = jwt.verify(new_token, 'my_secret_key');        
-            console.log("2 : ",decodedToken2);
-            const expiresIn2 = decodedToken.exp - now;
-            console.log(`JWT will expire in ${expiresIn2} seconds`); 
-            res.clearCookie("jwt");
-            res.cookie("jwt", new_token, {
-              httpOnly: true,
-              secure: true,
-              maxAge: 24 * 60 * 60 * 1000,
-            });        
+            },
+            "my_secret_key",
+            {
+              expiresIn: `${expiresIn}s`,
+            }
+          );
+          const decodedToken2 = jwt.verify(new_token, "my_secret_key");
+          console.log("2 : ", decodedToken2);
+          const expiresIn2 = decodedToken.exp - now;
+          console.log(`JWT will expire in ${expiresIn2} seconds`);
+          res.clearCookie("jwt");
+          res.cookie("jwt", new_token, {
+            httpOnly: true,
+            secure: true,
+            maxAge: 24 * 60 * 60 * 1000,
+          });
         } catch (err) {
-          console.error('Failed to verify JWT', err);
+          console.error("Failed to verify JWT", err);
         }
         req.flash("success_msg", "Updated successfully!");
         res.redirect(`/users/edit`);
@@ -193,7 +264,7 @@ class userController {
               },
               "my_secret_key",
               {
-                expiresIn: "5s",
+                expiresIn: "30m",
               }
             );
             res.cookie("jwt", token, {

@@ -21,7 +21,6 @@ module.exports = {
            if (err) {
             if(err.message === "jwt expired"){          
              const data = jwt.decode(token)
-             console.log(data);
              const new_token = jwt.sign(
               {
                 user: {
@@ -35,7 +34,6 @@ module.exports = {
                 expiresIn: "30m",
               }
             );
-            console.log("role",data.user.role);
             res.clearCookie("jwt");
             res.cookie("jwt", new_token, {
               httpOnly: true,
@@ -43,9 +41,8 @@ module.exports = {
               maxAge: 24 * 60 * 60 * 1000,
             });
             req.userId = data.user.userId;
-           req.name = data.user.name;
-           req.role = data.user.role;
-            console.log("zo refresh");
+            req.name = data.user.name;
+            req.role = data.user.role;
             next();
             }
             else{

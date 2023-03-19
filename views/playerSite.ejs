@@ -270,37 +270,15 @@
 
     </body>
     <script>
-        // $(document).ready(function() {
-        //   $('#search-input').on('keyup', function() {
-        //     if ($(this).val().length === 0) {
-        //       $('#search-btn').prop('disabled', true);
-        //     } else {
-        //       $('#search-btn').prop('disabled', false);
-        //     }
-        //   });
-        // });
-        // const searchForm = document.querySelector('#search-form');
-        //const searchResults = document.querySelector('#search-results');
         // Lấy đối tượng table
         const table = document.querySelector('#mytable');
         const pagin = document.querySelector('#pagination');
 
         // Xử lý sự kiện khi người dùng nhập từ khóa tìm kiếm
         const searchKeyword = document.querySelector('#search-keyword');
-        //const savedSearchKeyword = localStorage.getItem('searchKeyword');
-        // if (savedSearchKeyword) {
-        //         const valueSave = savedSearchKeyword;
-        //         if(valueSave){
-        //             console.log(valueSave);
-        //         }
-        //     }
         searchKeyword.addEventListener('input', (event) => {
             const value = event.target.value;
-
-
             if (value) {
-                //localStorage.setItem('searchKeyword', value);
-                // Gửi yêu cầu tìm kiếm tới máy chủ bằng AJAX
                 fetch(`/players/search?name=${value}`)
                     .then(response => response.text())
                     .then(html => {
@@ -346,7 +324,6 @@
                     .catch(error => console.error(error));
             } else {
                 // Trả lại dữ liệu ban đầu khi ô tìm kiếm rỗng
-                // table.innerHTML = originalData;
                 fetch(`/players`)
                     .then(response => response.text())
                     .then(html => {
