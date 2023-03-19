@@ -129,11 +129,17 @@ class PlayerController {
     });
   }
   index = async function index(req, res, next) {
-    const ITEMS_PER_PAGE = 3; // Số lượng players trên mỗi trang
+    const ITEMS_PER_PAGE = 1; // Số lượng players trên mỗi trang
     const page = +req.query.page || 1; // Lấy số trang hiện tại từ query string
     let totalItems; // Tổng số players trong cơ sở dữ liệu
     let totalPages;
+    let regex;
+    if(req.query.name){
+     regex = new RegExp(req.query.name, 'i');
+    }
+   
     const nations = await Nations.find();
+    if(!req.query.name){
     Players.find()
       .countDocuments()
       .then(count => {
@@ -165,17 +171,8 @@ class PlayerController {
         console.log(err);
         next();
       });
-    
-  }
-  searchPlayers = async function searchPlayers(req, res, next) {
-    const ITEMS_PER_PAGE = 1; // Số lượng players trên mỗi trang
-    const page = +req.query.page || 1; // Lấy số trang hiện tại từ query string
-    let totalItems; // Tổng số players trong cơ sở dữ liệu
-    let totalPages;
-    console.log(req.name, req.role);
-    const regex = new RegExp(req.query.name, 'i');
-    const nations = await Nations.find();
-    Players.find({ name: { $regex: regex } })
+    }else{
+      Players.find({ name: { $regex: regex } })
       .countDocuments()
       .then(count => {
         totalItems = count;
@@ -207,7 +204,50 @@ class PlayerController {
         console.log(err);
         next();
       });
+    }
+    
   }
+  // searchPlayers = async function searchPlayers(req, res, next) {
+  //   const ITEMS_PER_PAGE = 1; // Số lượng players trên mỗi trang
+  //   const page = +req.query.page || 1; // Lấy số trang hiện tại từ query string
+  //   let totalItems; // Tổng số players trong cơ sở dữ liệu
+  //   let totalPages;
+  //   console.log(req.name, req.role);
+  //   const regex = new RegExp(req.query.name, 'i');
+  //   const nations = await Nations.find();
+  //   Players.find({ name: { $regex: regex } })
+  //     .countDocuments()
+  //     .then(count => {
+  //       totalItems = count;
+  //       totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE); // Tính tổng số trang
+  //       return Players.find({ name: { $regex: regex } })
+  //         .skip((page - 1) * ITEMS_PER_PAGE) // Bỏ qua các players trên trang hiện tại
+  //         .limit(ITEMS_PER_PAGE) // Giới hạn số lượng players trên mỗi trang
+  //         .populate("nation", ["name", "description"])
+  //         .exec();
+  //     })
+  //     .then((players) => {
+  //       console.log(page,totalPages);
+  //       res.render("playerSite", {
+  //         title: "The list of Players",
+  //         players: players,
+  //         positionList: postitionData,
+  //         clubList: clubData,
+  //         nationsList: nations,
+  //         isLogin: {name: req.name, role:req.role},
+  //         currentPage: page,
+  //         hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+  //         hasPreviousPage: page > 1,
+  //         nextPage: page + 1,
+  //         previousPage: page - 1,
+  //         lastPage: totalPages
+  //       });
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       next();
+  //     });
+  // }
   
   create(req, res, next) {
     Nations.find({})

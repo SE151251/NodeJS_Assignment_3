@@ -2,6 +2,15 @@ const bcrypt = require("bcrypt");
 const User = require("../model/user");
 var passport = require("passport");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const mongoose = require("mongoose");
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "datnhtse151251@fpt.edu.vn",
+    pass: "25032001",
+  },
+});
 class userController {
   index(req, res, next) {
     res.render("register");
@@ -34,7 +43,7 @@ class userController {
         password,
       });
     } else {
-      User.findOne({ username: username }).then((user) => {
+      User.findOne({ username: username }).then((user) => {      
         if (user) {
           errors.push({ msg: "Username already exists" });
           res.render("register", {
@@ -42,26 +51,190 @@ class userController {
             username,
             password,
           });
-        } else {
+        } else {      
+          const email_temp = "user@gmail.com" 
           const newUser = new User({
             username,
             password,
+            email: email_temp,
           });
           //Hash password
           bcrypt.hash(newUser.password, 10, function (err, hash) {
-            if (err) throw err;
+            if (err){ 
+              console.log(err);
+              throw err           
+            };
             newUser.password = hash;
             newUser
               .save()
               .then((user) => {
                 res.redirect("/users/login");
               })
-              .catch(next);
+              .catch((error) => {
+                console.log(error);
+                next()
+              });
           });
         }
       });
     }
   }
+  renderForgotPassword(req, res, next) {
+    res.render("forgot-password", { errors: [] });
+  }
+
+  forgotPassword(req, res, next) {
+    const email = req.body.email;
+    let errors = [];
+
+    if (!email) {
+      errors.push({ msg: "Please enter your email" });
+      res.render("forgot-password", {
+        errors,
+        email,
+      });
+    } else {
+      // Check if user with provided email exists in database
+      User.findOne({ email: email })
+        .then((user) => {
+          if (!user) {
+            errors.push({ msg: "No user with that email address" });
+            res.render("forgot-password", {
+              errors,
+              email,
+            });
+          } else {
+            // Generate OTP and save it to user's document in database
+            const otp = Math.floor(100000 + Math.random() * 900000);
+            User.updateOTP(email, otp, Date.now() + 600000) // Update OTP for user
+              .then(() => {
+                // Send OTP to user's email address
+                const mailOptions = {
+                  to: email,
+                  from: "thienlmse151226@fpt.edu.vn",
+                  subject: "Password reset request",
+                  html: `
+                    <p>You are receiving this email because you (or someone else) have requested the reset of the password for your account.</p>
+                    <p>Please enter the following OTP to reset your password:</p>
+                    <h1>${otp}</h1>
+                    <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+                  `,
+                };
+                console.log("Email", { email });
+                transporter.sendMail(mailOptions, (err, info) => {
+                  if (err) {
+                    console.log(err);
+                    req.flash(
+                      "error_msg",
+                      "Something went wrong while sending the OTP email."
+                    );
+                    res.redirect("/users/forgot-password");
+                  } else {
+                    console.log("info ", info);
+                    req.flash("success_msg", `OTP has been sent to ${email}.`);
+                    res.redirect(`/users/reset-password-otp/${user._id}`);
+                  }
+                });
+              })
+              .catch(next);
+          }
+        })
+        .catch(next);
+    }
+  }
+
+  renderResetPassword = async (req, res, next) => {
+    try {
+      const { id, otp } = req.query;
+      // Render the reset password view and pass the id and otp to it
+      res.render("reset_password", { id, otp });
+    } catch (error) {
+      next(error);
+    }
+  };
+  resetPassword = (req, res, next) => {
+    const userId = req.params.id;
+    const password = req.body.newPassword;
+    const confirmPassword = req.body.confirmPassword;
+    console.log("ID password: ", req.params.id);
+    if (password !== confirmPassword) {
+      req.flash("error_msg", "Confirm password not match");
+      console.log("abc");
+      return res.redirect(`/users/reset-password/${userId}`);
+    }
+
+    // Check if user with provided ID exists in database
+    User.findById(userId)
+      .then((user) => {
+        if (!user) {
+          req.flash("error_msg", "User not found");
+          res.redirect("/users/forgot-password");
+        } else {
+          // Hash new password and update user's document in database
+          bcrypt.hash(password, 10, function (err, hash) {
+            if (err) throw err;
+            user.password = hash;
+            user
+              .save()
+              .then(() => {
+                req.flash("success_msg", "Change password successfully");
+                res.redirect("/users/login");
+              })
+              .catch(next);
+          });
+        }
+      })
+      .catch(next);
+  };
+
+  renderResetPasswordOTP(req, res, next) {
+    res.render("reset_password_otp");
+  }
+  resetPasswordOTP = async (req, res, next) => {
+    try {
+      const otp = req.body.otp;
+      const userId = req.params.id;
+
+      // Check if userID a valid ObjectId
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        req.flash("error_msg", "Invalid user id");
+        res.redirect("/users/forgot-password");
+        return;
+      }
+      // Check if user with provided userId exists in database
+      console.log("Id: ", req.params);
+      const user = await User.findById(userId);
+      console.log("user:", user); // Debugging line
+      if (!user) {
+        req.flash("error_msg", "User not found");
+        res.redirect("/users/forgot-password");
+      } else if (user.otp !== otp) {
+        req.flash(
+          "error_msg",
+          "Invalid OTP. Please enter the OTP sent to your email."
+        );
+        console.log("Otp: ", otp);
+        console.log("user.otp: ", user.otp); // Debugging line
+        res.redirect(`/users/reset-password-otp/${userId}`);
+      } else {
+        // Check if OTP has expired
+        if (user.otpExpiration && user.otpExpiration < Date.now()) {
+          req.flash("error_msg", "OTP has expired");
+          res.redirect("/users/forgot-password");
+          return;
+        }
+        // Redirect to reset password page with user's email and resetToken in query params
+        res.redirect(`/users/reset-password/${userId}`);
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+  renderResetPassword(req, res, next) {
+    res.render("reset_password");
+  }
+
   changePasswordIndex(req, res, next) {
     res.render("changePassword", {
       title: "Dashboard",
@@ -196,6 +369,7 @@ class userController {
   edit(req, res, next) {
     var data = {
       name: req.body.name,
+      email: req.body.email,
       YOB: req.body.yob,
     };
     User.updateOne({ _id: req.userId }, data)

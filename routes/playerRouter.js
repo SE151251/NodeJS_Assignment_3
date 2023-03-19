@@ -26,9 +26,6 @@ playerRouter
   .route("/")
   .get(jwtAuth,requireRole,playerController.index)
   .post(jwtAuth,requireRole, upload.single("file"), playerController.create);
-  playerRouter
-  .route("/search")
-  .get(jwtAuth,requireRole,playerController.searchPlayers)
 playerRouter
   .route("/edit/:playerId")
   .get(jwtAuth,requireRole, playerController.formEdit)

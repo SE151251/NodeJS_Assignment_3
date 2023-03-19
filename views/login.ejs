@@ -54,13 +54,22 @@
             <a href="/users" class="button is-primary"  style="width:7vw">Register</a>
           </div>
         </div>
+        <div class="field is-grouped">
+          <div class="control">
+            <a href="/users/forgot-password" class="button is-warning" style="width:9vw">Forgot password?</a>
+          </div>
+        </div>
       </div>
           <% if(error_msg !='' ){ %>
             <div class="notification is-danger is-light" style="padding: 2px; text-align: center;">
               <%= error_msg %>
             </div>
             <% } %>
-
+            <% if(success_msg !='' ){ %>
+              <div class="notification is-success is-light" style="padding: 2px; text-align: center;">
+                <%= success_msg %>
+              </div>
+              <% } %>
               <% if(error !='' ){ %>
                 <div class="notification is-danger is-light" style="padding: 2px; text-align: center;">
                   <%= error %>
