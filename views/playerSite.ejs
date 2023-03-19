@@ -318,8 +318,30 @@
                         for (let i = 0; i < aTags.length; i++) {
                             const pageNumber = i + 1;
                             aTags[i].setAttribute('href', `/players/search?page=${pageNumber}&name=${value}`);
+                            aTags[i].addEventListener('click', (event) => {
+                                event.preventDefault(); // Chặn sự kiện mặc định của trình duyệt
+                                // Thực hiện AJAX tại đây
+                                fetch(`/players/search?page=${i + 1}&name=${value}`)
+                                    .then(response => response.text())
+                                    .then(html => {
+                                        const parser = new DOMParser();
+                                        const doc = parser.parseFromString(html, 'text/html');
+                                        // Lấy phần tử table trong cây DOM
+                                        const tableElement = doc.querySelector('table');
+                                        //const paginElement = doc.querySelector('#pagination');
+                                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới                                     
+                                        table.innerHTML = tableElement.innerHTML;
+                                        const aTags1 = document.querySelector('a.is-current');
+
+                                        aTags1.classList.remove('is-current');
+
+                                        aTags[i].classList.add('is-current');
+                                        //pagin.innerHTML = paginElement.innerHTML;
+
+                                    });
+                            })
+
                         }
-                        console.log(pagin);
                     })
                     .catch(error => console.error(error));
             } else {
