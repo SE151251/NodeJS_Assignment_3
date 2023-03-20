@@ -171,20 +171,63 @@
                         </section>
                     </div>
                 </div>
-                <!-- <div class="box">
-                    <label for="search">Search here</label>
-                    <input type="text" id="search-input">
-                    <button type="submit" id="search-btn" disabled>Search</button>
-                  </div> -->
-                <form id="search-form" style="margin-top: 10px;">
-                    <div class="field has-addons">
-                        <div class="control is-expanded">
-                            <input class="input" type="text" placeholder="Enter search keyword" id="search-keyword">
+                <form id="search-form" style="margin-top: 10px; margin-left: 200px; margin-right: 200px;">
+                    <p class="control has-icons-left">
+                        <input class="input" type="text" placeholder="Search player(s) by name..." id="search-keyword">
+                        <span class="icon is-small is-left">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                      </p>
+                </form>
+                <div class="box" style="background-color: hsl(171, 100%, 41%); padding:20px; margin-top: 10px; margin-left: 200px; width: 20vw;">
+                <div style="font-size: 20px; font-weight: 700;"><i class="fa-solid fa-filter" style="margin-right: 5px;"></i>Filter</div>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Position</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-narrow">
+                                <div class="control">
+                                    <div class="select is-fullwidth">
+                                        <select name="filter-position" id="filter-position">
+                                            <option value="">
+                                                Filter By Postion
+                                            </option>
+                                            <%for (let position of positionList){ %>
+                                                <option value="<%= position.name %>">
+                                                    <%= position.name %>
+                                                </option>
+                                                <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </form>
-
-                <!-- <div id="search-results"></div> -->
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">Nation</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-narrow">
+                                <div class="control">
+                                    <div class="select is-fullwidth">
+                                        <select name="filter-nation" id="filter-nation">
+                                            <option value="">
+                                                Filter By Nation Name
+                                            </option>
+                                            <%for (let nation of nationsList){ %>
+                                                <option value="<%= nation._id %>">
+                                                    <%= nation.name %>
+                                                </option>
+                                                <% } %>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- table content -->
                 <div id="search-results" style="display: flex; justify-content: center;">
@@ -273,13 +316,75 @@
         // Lấy đối tượng table
         const table = document.querySelector('#mytable');
         const pagin = document.querySelector('#pagination');
-
         // Xử lý sự kiện khi người dùng nhập từ khóa tìm kiếm
         const searchKeyword = document.querySelector('#search-keyword');
-        searchKeyword.addEventListener('input', (event) => {
-            const value = event.target.value;
+        const filterPosition = document.querySelector('#filter-position');
+        const filterNation = document.querySelector('#filter-nation');
+        filterPosition.addEventListener('change', (event) => {          
+            const value = event.target.value; 
             if (value) {
-                fetch(`/players?name=${value}`)
+            const nation = filterNation.value;
+            const key = searchKeyword.value;         
+             var url;
+                if (filterNation.value == '' && searchKeyword.value == '') {
+                    url = ''
+                }
+                else if (searchKeyword.value == '' && filterNation.value != '') {
+                    url = `&nation=${nation}`
+                }
+                else if (searchKeyword.value != '' && filterNation.value == '') {
+                    url = `&name=${key}`
+                }
+                else if (searchKeyword.value != '' && searchKeyword.value != '') {
+                    url = `&nation=${nation}&name=${key}`
+                }
+
+                fetch(`/players?page=1&position=${value}${url}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        // Lấy phần tử table trong cây DOM
+                        const tableElement = doc.querySelector('table');
+                        const paginElement = doc.querySelector('#pagination');
+                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                        table.innerHTML = tableElement.innerHTML;
+                        pagin.innerHTML = paginElement.innerHTML;
+                        // Thay đổi tất cả các href trong phân trang thành "/users"
+                        const aTags = pagin.querySelectorAll('a');
+                        for (let i = 0; i < aTags.length; i++) {
+                            const pageNumber = i + 1;
+                            aTags[i].setAttribute('href', `/players?page=${pageNumber}&position=${value}${url}`);
+                            aTags[i].addEventListener('click', (event) => {
+                                event.preventDefault(); // Chặn sự kiện mặc định của trình duyệt
+                                // Thực hiện AJAX tại đây
+                                fetch(`/players?page=${i + 1}&position=${value}${url}`)
+                                    .then(response => response.text())
+                                    .then(html => {
+                                        const parser = new DOMParser();
+                                        const doc = parser.parseFromString(html, 'text/html');
+                                        // Lấy phần tử table trong cây DOM
+                                        const tableElement = doc.querySelector('table');
+                                        //const paginElement = doc.querySelector('#pagination');
+                                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới                                     
+                                        table.innerHTML = tableElement.innerHTML;
+                                        const aTags1 = document.querySelector('a.is-current');
+
+                                        aTags1.classList.remove('is-current');
+
+                                        aTags[i].classList.add('is-current');
+                                        //pagin.innerHTML = paginElement.innerHTML;
+
+                                    });
+                            })
+
+                        }
+                    })
+                    .catch(error => console.error(error));
+            } else {
+                if(searchKeyword.value){
+                    fetch(`/players?page=1&name=${searchKeyword.value}`)
                     .then(response => response.text())
                     .then(html => {
                         const parser = new DOMParser();
@@ -289,16 +394,166 @@
                         const paginElement = doc.querySelector('#pagination');
                         // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
                         table.innerHTML = tableElement.innerHTML;
-                        pagin.innerHTML = paginElement.innerHTML;                     
+                        pagin.innerHTML = paginElement.innerHTML;
+                    })
+                    .catch(error => console.error(error));
+                }
+                // Trả lại dữ liệu ban đầu khi ô tìm kiếm rỗng
+                else {fetch(`/players`)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        // Lấy phần tử table trong cây DOM
+                        const tableElement = doc.querySelector('table');
+                        const paginElement = doc.querySelector('#pagination');
+                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                        table.innerHTML = tableElement.innerHTML;
+                        pagin.innerHTML = paginElement.innerHTML;
+                    })
+                    .catch(error => console.error(error));
+            }}
+        })
+        filterNation.addEventListener('change', (event) => {          
+            const value = event.target.value; 
+            if (value) {
+            const position = filterPosition.value;
+            const key = searchKeyword.value;         
+             var url;
+                if (filterPosition.value == '' && searchKeyword.value == '') {
+                    url = ''
+                }
+                else if (searchKeyword.value == '' && filterPosition.value != '') {
+                    url = `&position=${position}`
+                }
+                else if (searchKeyword.value != '' && filterPosition.value == '') {
+                    url = `&name=${key}`
+                }
+                else if (searchKeyword.value != '' && searchKeyword.value != '') {
+                    url = `&position=${position}&name=${key}`
+                }
+
+                fetch(`/players?page=1&nation=${value}${url}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        // Lấy phần tử table trong cây DOM
+                        const tableElement = doc.querySelector('table');
+                        const paginElement = doc.querySelector('#pagination');
+                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                        table.innerHTML = tableElement.innerHTML;
+                        pagin.innerHTML = paginElement.innerHTML;
                         // Thay đổi tất cả các href trong phân trang thành "/users"
                         const aTags = pagin.querySelectorAll('a');
                         for (let i = 0; i < aTags.length; i++) {
                             const pageNumber = i + 1;
-                            aTags[i].setAttribute('href', `/players?page=${pageNumber}&name=${value}`);
+                            aTags[i].setAttribute('href', `/players?page=${pageNumber}&nation=${value}${url}`);
                             aTags[i].addEventListener('click', (event) => {
                                 event.preventDefault(); // Chặn sự kiện mặc định của trình duyệt
                                 // Thực hiện AJAX tại đây
-                                fetch(`/players?page=${i + 1}&name=${value}`)
+                                fetch(`/players?page=${i + 1}&nation=${value}${url}`)
+                                    .then(response => response.text())
+                                    .then(html => {
+                                        const parser = new DOMParser();
+                                        const doc = parser.parseFromString(html, 'text/html');
+                                        // Lấy phần tử table trong cây DOM
+                                        const tableElement = doc.querySelector('table');
+                                        //const paginElement = doc.querySelector('#pagination');
+                                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới                                     
+                                        table.innerHTML = tableElement.innerHTML;
+                                        const aTags1 = document.querySelector('a.is-current');
+
+                                        aTags1.classList.remove('is-current');
+
+                                        aTags[i].classList.add('is-current');
+                                        //pagin.innerHTML = paginElement.innerHTML;
+
+                                    });
+                            })
+
+                        }
+                    })
+                    .catch(error => console.error(error));
+            } else {
+                if(searchKeyword.value){
+                    fetch(`/players?page=1&name=${searchKeyword.value}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        // Lấy phần tử table trong cây DOM
+                        const tableElement = doc.querySelector('table');
+                        const paginElement = doc.querySelector('#pagination');
+                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                        table.innerHTML = tableElement.innerHTML;
+                        pagin.innerHTML = paginElement.innerHTML;
+                    })
+                    .catch(error => console.error(error));
+                }
+                // Trả lại dữ liệu ban đầu khi ô tìm kiếm rỗng
+                else {fetch(`/players`)
+                    .then(response => response.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        // Lấy phần tử table trong cây DOM
+                        const tableElement = doc.querySelector('table');
+                        const paginElement = doc.querySelector('#pagination');
+                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                        table.innerHTML = tableElement.innerHTML;
+                        pagin.innerHTML = paginElement.innerHTML;
+                    })
+                    .catch(error => console.error(error));
+            }}
+        })
+        searchKeyword.addEventListener('input', (event) => {
+            const value = event.target.value;
+            const nation = filterNation.value;
+            const position = filterPosition.value;
+            console.log("data filter: ", nation, position);
+            if (value) {
+                var url;
+                if (filterNation.value == '' && filterPosition.value == '') {
+                    url = ''
+                    console.log("1");
+                }
+                else if (filterPosition.value == '' && filterNation.value != '') {
+                    url = `&nation=${nation}`
+                    console.log("2");
+                }
+                else if (filterPosition.value != '' && filterNation.value == '') {
+                    url = `&position=${position}`
+                    console.log("3");
+                }
+                else if (filterPosition.value != '' && filterNation.value != '') {
+                    url = `&nation=${nation}&position=${position}`
+                    console.log("4");
+                }
+                console.log("url: ", url);
+                console.log("url2: ", `/players?page=1&name=${value}${url}`);
+                fetch(`/players?page=1&name=${value}${url}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        // Lấy phần tử table trong cây DOM
+                        const tableElement = doc.querySelector('table');
+                        const paginElement = doc.querySelector('#pagination');
+                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                        table.innerHTML = tableElement.innerHTML;
+                        pagin.innerHTML = paginElement.innerHTML;
+                        // Thay đổi tất cả các href trong phân trang thành "/users"
+                        const aTags = pagin.querySelectorAll('a');
+                        for (let i = 0; i < aTags.length; i++) {
+                            const pageNumber = i + 1;
+                            aTags[i].setAttribute('href', `/players?page=${pageNumber}&name=${value}${url}`);
+                            aTags[i].addEventListener('click', (event) => {
+                                event.preventDefault(); // Chặn sự kiện mặc định của trình duyệt
+                                // Thực hiện AJAX tại đây
+                                fetch(`/players?page=${i + 1}&name=${value}${url}`)
                                     .then(response => response.text())
                                     .then(html => {
                                         const parser = new DOMParser();

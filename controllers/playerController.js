@@ -25,39 +25,65 @@ let postitionData = [
 ];
 class PlayerController {
   home(req, res, next) {
-    if(req.cookies.jwt){
-      jwt.verify(req.cookies.jwt, 'my_secret_key', (err, decoded) => {
+    if (req.cookies.jwt) {
+      jwt.verify(req.cookies.jwt, "my_secret_key", (err, decoded) => {
         if (err) {
           req.name = undefined;
           req.role = undefined;
           Nations.find({})
-      .then((nations) => {
-        Players.find({ isCaptain: true })
-          .populate("nation", ["name", "description"])
-          .then((players) => {
-            res.render("index", {
-              title: "The list of Players",
-              players: players,
-              positionList: postitionData,
-              clubList: clubData,
-              nationsList: nations,
-              isLogin: {name: req.name, role:req.role}
+            .then((nations) => {
+              Players.find({ isCaptain: true })
+                .populate("nation", ["name", "description"])
+                .then((players) => {
+                  res.render("index", {
+                    title: "The list of Players",
+                    players: players,
+                    positionList: postitionData,
+                    clubList: clubData,
+                    nationsList: nations,
+                    isLogin: { name: req.name, role: req.role },
+                  });
+                })
+                .catch((err) => {
+                  console.log(err);
+                  next();
+                });
+            })
+            .catch((err) => {
+              console.log(err);
+              next();
             });
-          })
-          .catch((err) => {
-            console.log(err);
-            next();
-          });
-      })
-      .catch((err) => {
-        console.log(err);
-        next();
+        } else {
+          req.userId = decoded.user.userId;
+          req.name = decoded.user.name;
+          req.role = decoded.user.role;
+          Nations.find({})
+            .then((nations) => {
+              Players.find({ isCaptain: true })
+                .populate("nation", ["name", "description"])
+                .then((players) => {
+                  res.render("index", {
+                    title: "The list of Players",
+                    players: players,
+                    positionList: postitionData,
+                    clubList: clubData,
+                    nationsList: nations,
+                    isLogin: { name: req.name, role: req.role },
+                  });
+                })
+                .catch((err) => {
+                  console.log(err);
+                  next();
+                });
+            })
+            .catch((err) => {
+              console.log(err);
+              next();
+            });
+        }
       });
-        }else{
-        req.userId = decoded.user.userId;
-        req.name = decoded.user.name;
-        req.role = decoded.user.role;
-        Nations.find({})
+    } else {
+      Nations.find({})
         .then((nations) => {
           Players.find({ isCaptain: true })
             .populate("nation", ["name", "description"])
@@ -68,7 +94,7 @@ class PlayerController {
                 positionList: postitionData,
                 clubList: clubData,
                 nationsList: nations,
-                isLogin: {name: req.name, role:req.role}
+                isLogin: { name: req.name, role: req.role },
               });
             })
             .catch((err) => {
@@ -80,175 +106,172 @@ class PlayerController {
           console.log(err);
           next();
         });
-        }      
+    }
+  }
+  dashboard(req, res, next) {
+    Promise.all([
+      Players.countDocuments({}),
+      Nations.countDocuments({}),
+      Users.countDocuments({}),
+    ])
+      .then(([totalPlayers, totalNations, totalUsers]) => {
+        res.render("dashboard", {
+          title: "Dashboard",
+          totalNations: totalNations,
+          totalPlayers: totalPlayers,
+          totalUsers: totalUsers,
+          isLogin: { name: req.name, role: req.role },
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        next();
       });
-    }else{
-    Nations.find({})
-      .then((nations) => {
-        Players.find({ isCaptain: true })
-          .populate("nation", ["name", "description"])
+  }
+  index = async function index(req, res, next) {
+    const ITEMS_PER_PAGE = 5; // Số lượng players trên mỗi trang
+    const page = +req.query.page || 1; // Lấy số trang hiện tại từ query string
+    let totalItems; // Tổng số players trong cơ sở dữ liệu
+    let totalPages;
+    let regex;
+    const filter_nation = req.query.nation;
+    const filter_position = req.query.position;
+    console.log(filter_position, filter_nation);
+    if (req.query.name) {
+      regex = new RegExp(req.query.name, "i");
+    }
+    const nations = await Nations.find();
+    if (!req.query.name) {
+      if (filter_nation || filter_position) {
+        console.log("zo none key");
+        var query;
+        if (filter_nation != undefined && filter_position != undefined) {
+          query = { position: filter_position,  nation: filter_nation };
+        }
+        if (filter_nation == undefined && filter_position != undefined) {
+          query = { position: filter_position };
+        }
+        if (filter_nation != undefined && filter_position == undefined) {
+          query = { nation: filter_nation };
+        }
+        Players.find(query)
+          .countDocuments()
+          .then((count) => {
+            totalItems = count;
+            totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE); // Tính tổng số trang
+            return Players.find(query)
+              .skip((page - 1) * ITEMS_PER_PAGE) // Bỏ qua các players trên trang hiện tại
+              .limit(ITEMS_PER_PAGE) // Giới hạn số lượng players trên mỗi trang
+              .populate("nation", ["name", "description"])
+              .exec();
+          })
           .then((players) => {
-            res.render("index", {
+            res.render("playerSite", {
               title: "The list of Players",
               players: players,
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
-              isLogin: {name: req.name, role:req.role}
+              isLogin: { name: req.name, role: req.role },
+              currentPage: page,
+              hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+              hasPreviousPage: page > 1,
+              nextPage: page + 1,
+              previousPage: page - 1,
+              lastPage: totalPages,
             });
           })
           .catch((err) => {
             console.log(err);
             next();
           });
-      })
-      .catch((err) => {
-        console.log(err);
-        next();
-      });
-    }
-  }
-  dashboard(req, res, next){
-    Promise.all([
-      Players.countDocuments({}),
-      Nations.countDocuments({}),
-      Users.countDocuments({})
-     ])
-    .then(([totalPlayers, totalNations, totalUsers]) => {
-     res.render('dashboard', {
-      title: "Dashboard",
-      totalNations: totalNations,
-      totalPlayers: totalPlayers,
-      totalUsers: totalUsers,
-      isLogin: {name: req.name, role:req.role}
-     })
-    })
-    .catch(err => {
-      console.error(err);
-      next()
-    });
-  }
-  index = async function index(req, res, next) {
-    const ITEMS_PER_PAGE = 1; // Số lượng players trên mỗi trang
-    const page = +req.query.page || 1; // Lấy số trang hiện tại từ query string
-    let totalItems; // Tổng số players trong cơ sở dữ liệu
-    let totalPages;
-    let regex;
-    if(req.query.name){
-     regex = new RegExp(req.query.name, 'i');
-    }
-   
-    const nations = await Nations.find();
-    if(!req.query.name){
-    Players.find()
-      .countDocuments()
-      .then(count => {
-        totalItems = count;
-        totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE); // Tính tổng số trang
-        return Players.find()
-          .skip((page - 1) * ITEMS_PER_PAGE) // Bỏ qua các players trên trang hiện tại
-          .limit(ITEMS_PER_PAGE) // Giới hạn số lượng players trên mỗi trang
-          .populate("nation", ["name", "description"])
-          .exec();
-      })
-      .then((players) => {
-        res.render("playerSite", {
-          title: "The list of Players",
-          players: players,
-          positionList: postitionData,
-          clubList: clubData,
-          nationsList: nations,
-          isLogin: {name: req.name, role:req.role},
-          currentPage: page,
-          hasNextPage: ITEMS_PER_PAGE * page < totalItems,
-          hasPreviousPage: page > 1,
-          nextPage: page + 1,
-          previousPage: page - 1,
-          lastPage: totalPages
+      } else {
+        Players.find()
+          .countDocuments()
+          .then((count) => {
+            totalItems = count;
+            totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE); // Tính tổng số trang
+            return Players.find()
+              .skip((page - 1) * ITEMS_PER_PAGE) // Bỏ qua các players trên trang hiện tại
+              .limit(ITEMS_PER_PAGE) // Giới hạn số lượng players trên mỗi trang
+              .populate("nation", ["name", "description"])
+              .exec();
+          })
+          .then((players) => {
+            res.render("playerSite", {
+              title: "The list of Players",
+              players: players,
+              positionList: postitionData,
+              clubList: clubData,
+              nationsList: nations,
+              isLogin: { name: req.name, role: req.role },
+              currentPage: page,
+              hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+              hasPreviousPage: page > 1,
+              nextPage: page + 1,
+              previousPage: page - 1,
+              lastPage: totalPages,
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            next();
+          });
+      }
+    } else {
+      var query;
+      if (filter_nation != undefined && filter_position != undefined) {
+        query = {
+          name: { $regex: regex },
+          position: filter_position,
+          nation: filter_nation,
+        };
+      }
+      if (filter_nation == undefined && filter_position == undefined) {
+        query = {
+          name: { $regex: regex },
+        };
+      }
+      if (filter_nation == undefined && filter_position != undefined) {
+        query = { name: { $regex: regex }, position: filter_position };
+      }
+      if (filter_nation != undefined && filter_position == undefined) {
+        query = { name: { $regex: regex }, nation: filter_nation };
+      }
+      Players.find(query)
+        .countDocuments()
+        .then((count) => {
+          totalItems = count;
+          totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE); // Tính tổng số trang
+          return Players.find(query)
+            .skip((page - 1) * ITEMS_PER_PAGE) // Bỏ qua các players trên trang hiện tại
+            .limit(ITEMS_PER_PAGE) // Giới hạn số lượng players trên mỗi trang
+            .populate("nation", ["name", "description"])
+            .exec();
+        })
+        .then((players) => {
+          res.render("playerSite", {
+            title: "The list of Players",
+            players: players,
+            positionList: postitionData,
+            clubList: clubData,
+            nationsList: nations,
+            isLogin: { name: req.name, role: req.role },
+            currentPage: page,
+            hasNextPage: ITEMS_PER_PAGE * page < totalItems,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page - 1,
+            lastPage: totalPages,
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+          next();
         });
-      })
-      .catch((err) => {
-        console.log(err);
-        next();
-      });
-    }else{
-      Players.find({ name: { $regex: regex } })
-      .countDocuments()
-      .then(count => {
-        totalItems = count;
-        totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE); // Tính tổng số trang
-        return Players.find({ name: { $regex: regex } })
-          .skip((page - 1) * ITEMS_PER_PAGE) // Bỏ qua các players trên trang hiện tại
-          .limit(ITEMS_PER_PAGE) // Giới hạn số lượng players trên mỗi trang
-          .populate("nation", ["name", "description"])
-          .exec();
-      })
-      .then((players) => {
-        console.log(page,totalPages);
-        res.render("playerSite", {
-          title: "The list of Players",
-          players: players,
-          positionList: postitionData,
-          clubList: clubData,
-          nationsList: nations,
-          isLogin: {name: req.name, role:req.role},
-          currentPage: page,
-          hasNextPage: ITEMS_PER_PAGE * page < totalItems,
-          hasPreviousPage: page > 1,
-          nextPage: page + 1,
-          previousPage: page - 1,
-          lastPage: totalPages
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        next();
-      });
     }
-    
-  }
-  // searchPlayers = async function searchPlayers(req, res, next) {
-  //   const ITEMS_PER_PAGE = 1; // Số lượng players trên mỗi trang
-  //   const page = +req.query.page || 1; // Lấy số trang hiện tại từ query string
-  //   let totalItems; // Tổng số players trong cơ sở dữ liệu
-  //   let totalPages;
-  //   console.log(req.name, req.role);
-  //   const regex = new RegExp(req.query.name, 'i');
-  //   const nations = await Nations.find();
-  //   Players.find({ name: { $regex: regex } })
-  //     .countDocuments()
-  //     .then(count => {
-  //       totalItems = count;
-  //       totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE); // Tính tổng số trang
-  //       return Players.find({ name: { $regex: regex } })
-  //         .skip((page - 1) * ITEMS_PER_PAGE) // Bỏ qua các players trên trang hiện tại
-  //         .limit(ITEMS_PER_PAGE) // Giới hạn số lượng players trên mỗi trang
-  //         .populate("nation", ["name", "description"])
-  //         .exec();
-  //     })
-  //     .then((players) => {
-  //       console.log(page,totalPages);
-  //       res.render("playerSite", {
-  //         title: "The list of Players",
-  //         players: players,
-  //         positionList: postitionData,
-  //         clubList: clubData,
-  //         nationsList: nations,
-  //         isLogin: {name: req.name, role:req.role},
-  //         currentPage: page,
-  //         hasNextPage: ITEMS_PER_PAGE * page < totalItems,
-  //         hasPreviousPage: page > 1,
-  //         nextPage: page + 1,
-  //         previousPage: page - 1,
-  //         lastPage: totalPages
-  //       });
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       next();
-  //     });
-  // }
-  
+  };
+
   create(req, res, next) {
     Nations.find({})
       .then((nations) => {
@@ -258,7 +281,7 @@ class PlayerController {
             "Please input data of nations in Database first!!!"
           );
           return res.redirect("/players");
-        } else {          
+        } else {
           var data = {
             name: req.body.name,
             image:
@@ -292,12 +315,12 @@ class PlayerController {
   }
   playerDetail(req, res, next) {
     const playerId = req.params.playerId;
-      if(req.cookies.jwt){
-        jwt.verify(req.cookies.jwt, 'my_secret_key', (err, decoded) => {
-          if (err) {
-            req.name = undefined;
-            req.role = undefined;
-            Nations.find({})
+    if (req.cookies.jwt) {
+      jwt.verify(req.cookies.jwt, "my_secret_key", (err, decoded) => {
+        if (err) {
+          req.name = undefined;
+          req.role = undefined;
+          Nations.find({})
             .then((nations) => {
               Players.findById(playerId)
                 .populate("nation", "name")
@@ -308,37 +331,37 @@ class PlayerController {
                     positionList: postitionData,
                     clubList: clubData,
                     nationsList: nations,
-                    isLogin: {name: req.name, role:req.role}
+                    isLogin: { name: req.name, role: req.role },
                   });
                 })
                 .catch(next);
             })
             .catch(next);
-          }else{
+        } else {
           req.userId = decoded.user.userId;
           req.name = decoded.user.name;
           req.role = decoded.user.role;
           Nations.find({})
-          .then((nations) => {
-            Players.findById(playerId)
-              .populate("nation", "name")
-              .then((player) => {
-                res.render("playerDetail", {
-                  title: "The detail of Player",
-                  player: player,
-                  positionList: postitionData,
-                  clubList: clubData,
-                  nationsList: nations,
-                  isLogin: {name: req.name, role:req.role}
-                });
-              })
-              .catch(next);
-          })
-          .catch(next);
-          }      
-        });
-      }else{
-        Nations.find({})
+            .then((nations) => {
+              Players.findById(playerId)
+                .populate("nation", "name")
+                .then((player) => {
+                  res.render("playerDetail", {
+                    title: "The detail of Player",
+                    player: player,
+                    positionList: postitionData,
+                    clubList: clubData,
+                    nationsList: nations,
+                    isLogin: { name: req.name, role: req.role },
+                  });
+                })
+                .catch(next);
+            })
+            .catch(next);
+        }
+      });
+    } else {
+      Nations.find({})
         .then((nations) => {
           Players.findById(playerId)
             .populate("nation", "name")
@@ -349,20 +372,20 @@ class PlayerController {
                 positionList: postitionData,
                 clubList: clubData,
                 nationsList: nations,
-                isLogin: {name: req.name, role:req.role}
+                isLogin: { name: req.name, role: req.role },
               });
             })
             .catch(next);
         })
         .catch(next);
-      }
-
+    }
   }
   formEdit(req, res, next) {
     const playerId = req.params.playerId;
     Nations.find({})
       .then((nations) => {
-        Players.findById(playerId).populate("nation", "name")
+        Players.findById(playerId)
+          .populate("nation", "name")
           .then((player) => {
             res.render("editPlayer", {
               title: "The detail of Player",
@@ -370,7 +393,7 @@ class PlayerController {
               positionList: postitionData,
               clubList: clubData,
               nationsList: nations,
-              isLogin: {name: req.name, role:req.role}
+              isLogin: { name: req.name, role: req.role },
             });
           })
           .catch(next);
@@ -399,23 +422,22 @@ class PlayerController {
         isCaptain: req.body.isCaptain === undefined ? false : true,
       };
     }
-    Players.find({ name: req.body.name }).then((playerCheck) => {
-      if (playerCheck.length > 0) {
+    // Players.find({ name: req.body.name }).then((playerCheck) => {
+    //   if (playerCheck.length > 0) {
+    //     req.flash("error_msg", "Duplicate player name!");
+    //     return res.redirect("/players");
+    //   } else {
+    Players.updateOne({ _id: req.params.playerId }, data)
+      .then(() => {
+        res.redirect("/players");
+      })
+      .catch((err) => {
+        console.log("error update: ", err);
         req.flash("error_msg", "Duplicate player name!");
-        return res.redirect("/players");
-      } else {
-        Players.updateOne({ _id: req.params.playerId }, data)
-        .then(() => {
-          res.redirect("/players");
-        })
-        .catch((err) => {
-          console.log("error update: ", err);
-          req.flash("error_msg", "Duplicate player name!");
-          res.redirect(`/players/edit/${req.params.playerId}`);
-        });
-      }
-    });
-
+        res.redirect(`/players/edit/${req.params.playerId}`);
+      });
+    //   }
+    // });
   }
   delete(req, res, next) {
     Players.findByIdAndDelete({ _id: req.params.playerId })
