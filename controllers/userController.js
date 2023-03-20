@@ -7,8 +7,11 @@ const mongoose = require("mongoose");
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "datnhtse151251@fpt.edu.vn",
-    pass: "25032001",
+    // thiết lập email chủ để send otp đến các email khác
+    // để sử dụng được chức năng này, vào phần quản lý bảo mật của email chủ đăng ký ở đây
+    // Kéo xuống đến mục "Less secure app access" và bật tính năng này lên
+    user: "your_email",
+    pass: "your_password",
   },
 });
 class userController {
