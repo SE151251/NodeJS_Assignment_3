@@ -177,10 +177,12 @@
                         <span class="icon is-small is-left">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-                      </p>
+                    </p>
                 </form>
-                <div class="box" style="background-color: hsl(171, 100%, 41%); padding:20px; margin-top: 10px; margin-left: 200px; width: 20vw;">
-                <div style="font-size: 20px; font-weight: 700;"><i class="fa-solid fa-filter" style="margin-right: 5px;"></i>Filter</div>
+                <div class="box"
+                    style="background-color: hsl(171, 100%, 41%); padding:20px; margin-top: 10px; margin-left: 200px; width: 20vw;">
+                    <div style="font-size: 20px; font-weight: 700;"><i class="fa-solid fa-filter"
+                            style="margin-right: 5px;"></i>Filter</div>
                     <div class="field is-horizontal">
                         <div class="field-label is-normal">
                             <label class="label">Position</label>
@@ -316,16 +318,19 @@
         // Lấy đối tượng table
         const table = document.querySelector('#mytable');
         const pagin = document.querySelector('#pagination');
+
         // Xử lý sự kiện khi người dùng nhập từ khóa tìm kiếm
         const searchKeyword = document.querySelector('#search-keyword');
+
+        //-----------------------------Start handle filter realtime--------------------------
         const filterPosition = document.querySelector('#filter-position');
         const filterNation = document.querySelector('#filter-nation');
-        filterPosition.addEventListener('change', (event) => {          
-            const value = event.target.value; 
+        filterPosition.addEventListener('change', (event) => {
+            const value = event.target.value;
             if (value) {
-            const nation = filterNation.value;
-            const key = searchKeyword.value;         
-             var url;
+                const nation = filterNation.value;
+                const key = searchKeyword.value;
+                var url;
                 if (filterNation.value == '' && searchKeyword.value == '') {
                     url = ''
                 }
@@ -342,7 +347,7 @@
                 fetch(`/players?page=1&position=${value}${url}`)
                     .then(response => response.text())
                     .then(html => {
-                        
+
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(html, 'text/html');
                         // Lấy phần tử table trong cây DOM
@@ -383,8 +388,38 @@
                     })
                     .catch(error => console.error(error));
             } else {
-                if(searchKeyword.value){
+                if (searchKeyword.value) {
                     fetch(`/players?page=1&name=${searchKeyword.value}`)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            // Lấy phần tử table trong cây DOM
+                            const tableElement = doc.querySelector('table');
+                            const paginElement = doc.querySelector('#pagination');
+                            // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                            table.innerHTML = tableElement.innerHTML;
+                            pagin.innerHTML = paginElement.innerHTML;
+                        })
+                        .catch(error => console.error(error));
+                } else if (filterNation) {
+                    fetch(`/players?page=1&nation=${filterNation.value}`)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            // Lấy phần tử table trong cây DOM
+                            const tableElement = doc.querySelector('table');
+                            const paginElement = doc.querySelector('#pagination');
+                            // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                            table.innerHTML = tableElement.innerHTML;
+                            pagin.innerHTML = paginElement.innerHTML;
+                        })
+                        .catch(error => console.error(error));
+                }
+                // Trả lại dữ liệu ban đầu khi ô tìm kiếm rỗng
+                else {
+                    fetch(`/players`)
                     .then(response => response.text())
                     .then(html => {
                         const parser = new DOMParser();
@@ -398,28 +433,14 @@
                     })
                     .catch(error => console.error(error));
                 }
-                // Trả lại dữ liệu ban đầu khi ô tìm kiếm rỗng
-                else {fetch(`/players`)
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        // Lấy phần tử table trong cây DOM
-                        const tableElement = doc.querySelector('table');
-                        const paginElement = doc.querySelector('#pagination');
-                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
-                        table.innerHTML = tableElement.innerHTML;
-                        pagin.innerHTML = paginElement.innerHTML;
-                    })
-                    .catch(error => console.error(error));
-            }}
+            }
         })
-        filterNation.addEventListener('change', (event) => {          
-            const value = event.target.value; 
+        filterNation.addEventListener('change', (event) => {
+            const value = event.target.value;
             if (value) {
-            const position = filterPosition.value;
-            const key = searchKeyword.value;         
-             var url;
+                const position = filterPosition.value;
+                const key = searchKeyword.value;
+                var url;
                 if (filterPosition.value == '' && searchKeyword.value == '') {
                     url = ''
                 }
@@ -432,11 +453,10 @@
                 else if (searchKeyword.value != '' && searchKeyword.value != '') {
                     url = `&position=${position}&name=${key}`
                 }
-
                 fetch(`/players?page=1&nation=${value}${url}`)
                     .then(response => response.text())
                     .then(html => {
-                        
+
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(html, 'text/html');
                         // Lấy phần tử table trong cây DOM
@@ -477,8 +497,38 @@
                     })
                     .catch(error => console.error(error));
             } else {
-                if(searchKeyword.value){
+                if (searchKeyword.value) {
                     fetch(`/players?page=1&name=${searchKeyword.value}`)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            // Lấy phần tử table trong cây DOM
+                            const tableElement = doc.querySelector('table');
+                            const paginElement = doc.querySelector('#pagination');
+                            // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                            table.innerHTML = tableElement.innerHTML;
+                            pagin.innerHTML = paginElement.innerHTML;
+                        })
+                        .catch(error => console.error(error));
+                } else if (filterPosition) {
+                    fetch(`/players?page=1&position=${filterPosition.value}`)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            // Lấy phần tử table trong cây DOM
+                            const tableElement = doc.querySelector('table');
+                            const paginElement = doc.querySelector('#pagination');
+                            // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                            table.innerHTML = tableElement.innerHTML;
+                            pagin.innerHTML = paginElement.innerHTML;
+                        })
+                        .catch(error => console.error(error));
+                }
+                // Trả lại dữ liệu ban đầu khi ô tìm kiếm rỗng
+                else {
+                    fetch(`/players`)
                     .then(response => response.text())
                     .then(html => {
                         const parser = new DOMParser();
@@ -492,22 +542,13 @@
                     })
                     .catch(error => console.error(error));
                 }
-                // Trả lại dữ liệu ban đầu khi ô tìm kiếm rỗng
-                else {fetch(`/players`)
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        // Lấy phần tử table trong cây DOM
-                        const tableElement = doc.querySelector('table');
-                        const paginElement = doc.querySelector('#pagination');
-                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
-                        table.innerHTML = tableElement.innerHTML;
-                        pagin.innerHTML = paginElement.innerHTML;
-                    })
-                    .catch(error => console.error(error));
-            }}
+            }
         })
+        //-----------------------------End handle filter realtime--------------------------
+
+        //--------------------------------------------------------------------------------------------------------------
+
+        //-----------------------------Start handle search realtime--------------------------
         searchKeyword.addEventListener('input', (event) => {
             const value = event.target.value;
             const nation = filterNation.value;
@@ -536,7 +577,7 @@
                 fetch(`/players?page=1&name=${value}${url}`)
                     .then(response => response.text())
                     .then(html => {
-                        
+
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(html, 'text/html');
                         // Lấy phần tử table trong cây DOM
@@ -578,22 +619,48 @@
                     .catch(error => console.error(error));
             } else {
                 // Trả lại dữ liệu ban đầu khi ô tìm kiếm rỗng
-                fetch(`/players`)
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        // Lấy phần tử table trong cây DOM
-                        const tableElement = doc.querySelector('table');
-                        const paginElement = doc.querySelector('#pagination');
-                        // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
-                        table.innerHTML = tableElement.innerHTML;
-                        pagin.innerHTML = paginElement.innerHTML;
-                    })
-                    .catch(error => console.error(error));
+                if (filterNation.value || filterPosition.value) {
+                    var url = '';
+                    if (filterPosition.value == '' && filterNation.value != '') {
+                        url = `?nation=${nation}`
+                    }
+                    else if (filterPosition.value != '' && filterNation.value == '') {
+                        url = `?position=${position}`
+                    }
+                    else if (filterPosition.value != '' && filterNation.value != '') {
+                        url = `?nation=${nation}&position=${position}`
+                    }
+                    fetch(`/players${url}`)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            // Lấy phần tử table trong cây DOM
+                            const tableElement = doc.querySelector('table');
+                            const paginElement = doc.querySelector('#pagination');
+                            // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                            table.innerHTML = tableElement.innerHTML;
+                            pagin.innerHTML = paginElement.innerHTML;
+                        })
+                        .catch(error => console.error(error));
+                } else {
+                    fetch(`/players`)
+                        .then(response => response.text())
+                        .then(html => {
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(html, 'text/html');
+                            // Lấy phần tử table trong cây DOM
+                            const tableElement = doc.querySelector('table');
+                            const paginElement = doc.querySelector('#pagination');
+                            // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
+                            table.innerHTML = tableElement.innerHTML;
+                            pagin.innerHTML = paginElement.innerHTML;
+                        })
+                        .catch(error => console.error(error));
+                }
             }
         });
-
+        //-----------------------------End handle search realtime--------------------------
         // $(document).ready(function () {
         //     $('#mytable').DataTable();
         // });

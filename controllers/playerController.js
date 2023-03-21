@@ -129,7 +129,7 @@ class PlayerController {
       });
   }
   index = async function index(req, res, next) {
-    const ITEMS_PER_PAGE = 5; // Số lượng players trên mỗi trang
+    const ITEMS_PER_PAGE = 10; // Số lượng players trên mỗi trang
     const page = +req.query.page || 1; // Lấy số trang hiện tại từ query string
     let totalItems; // Tổng số players trong cơ sở dữ liệu
     let totalPages;

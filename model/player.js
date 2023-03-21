@@ -3,7 +3,7 @@ mongoose.set("strictQuery", true);
 const Schema = mongoose.Schema;
 const playerSchema = new Schema(
   {
-    name: { type: String, require: true },
+    name: { type: String, require: true, unique: true},
     image: { type: String, require: true },
     career: { type: String },
     position: { type: String, require: true },
