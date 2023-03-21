@@ -136,14 +136,12 @@ class PlayerController {
     let regex;
     const filter_nation = req.query.nation;
     const filter_position = req.query.position;
-    console.log(filter_position, filter_nation);
     if (req.query.name) {
       regex = new RegExp(req.query.name, "i");
     }
     const nations = await Nations.find();
     if (!req.query.name) {
       if (filter_nation || filter_position) {
-        console.log("zo none key");
         var query;
         if (filter_nation != undefined && filter_position != undefined) {
           query = { position: filter_position,  nation: filter_nation };

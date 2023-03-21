@@ -172,7 +172,7 @@
                     </div>
                 </div>
                 <form id="search-form" style="margin-top: 10px; margin-left: 200px; margin-right: 200px;">
-                    <p class="control has-icons-left">
+                    <p class="control has-icons-left" id="box-search">
                         <input class="input" type="text" placeholder="Search player(s) by name..." id="search-keyword">
                         <span class="icon is-small is-left">
                             <i class="fa-solid fa-magnifying-glass"></i>
@@ -327,7 +327,7 @@
         const filterNation = document.querySelector('#filter-nation');
         filterPosition.addEventListener('change', (event) => {
             const value = event.target.value;
-            if (value) {
+            if (value) {              
                 const nation = filterNation.value;
                 const key = searchKeyword.value;
                 var url;
@@ -342,12 +342,10 @@
                 }
                 else if (searchKeyword.value != '' && searchKeyword.value != '') {
                     url = `&nation=${nation}&name=${key}`
-                }
-
+                }               
                 fetch(`/players?page=1&position=${value}${url}`)
                     .then(response => response.text())
                     .then(html => {
-
                         const parser = new DOMParser();
                         const doc = parser.parseFromString(html, 'text/html');
                         // Lấy phần tử table trong cây DOM
@@ -383,7 +381,6 @@
 
                                     });
                             })
-
                         }
                     })
                     .catch(error => console.error(error));
@@ -550,6 +547,8 @@
 
         //-----------------------------Start handle search realtime--------------------------
         searchKeyword.addEventListener('input', (event) => {
+            const box_search = document.querySelector('#box-search');
+            box_search.classList.add('is-loading');
             const value = event.target.value;
             const nation = filterNation.value;
             const position = filterPosition.value;
@@ -586,6 +585,7 @@
                         // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
                         table.innerHTML = tableElement.innerHTML;
                         pagin.innerHTML = paginElement.innerHTML;
+                        box_search.classList.remove('is-loading');
                         // Thay đổi tất cả các href trong phân trang thành "/users"
                         const aTags = pagin.querySelectorAll('a');
                         for (let i = 0; i < aTags.length; i++) {
@@ -609,11 +609,9 @@
                                         aTags1.classList.remove('is-current');
 
                                         aTags[i].classList.add('is-current');
-                                        //pagin.innerHTML = paginElement.innerHTML;
-
+                                        //pagin.innerHTML = paginElement.innerHTML;                                    
                                     });
                             })
-
                         }
                     })
                     .catch(error => console.error(error));
@@ -630,6 +628,7 @@
                     else if (filterPosition.value != '' && filterNation.value != '') {
                         url = `?nation=${nation}&position=${position}`
                     }
+                    box_search.classList.add('is-loading');
                     fetch(`/players${url}`)
                         .then(response => response.text())
                         .then(html => {
@@ -641,9 +640,11 @@
                             // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
                             table.innerHTML = tableElement.innerHTML;
                             pagin.innerHTML = paginElement.innerHTML;
+                            box_search.classList.remove('is-loading');
                         })
                         .catch(error => console.error(error));
                 } else {
+                    box_search.classList.add('is-loading');
                     fetch(`/players`)
                         .then(response => response.text())
                         .then(html => {
@@ -655,6 +656,7 @@
                             // Cập nhật dữ liệu trong table với kết quả tìm kiếm mới
                             table.innerHTML = tableElement.innerHTML;
                             pagin.innerHTML = paginElement.innerHTML;
+                            box_search.classList.remove('is-loading');
                         })
                         .catch(error => console.error(error));
                 }
