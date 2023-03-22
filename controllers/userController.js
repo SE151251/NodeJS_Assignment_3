@@ -351,7 +351,20 @@ class userController {
       res.redirect("/users/login");
     });
   }
-
+  checkEmailDuplicated(req, res, next) {
+    const email = req.query.email;
+    const id = req.query.id;
+    console.log(email,id);
+    User.find({ _id: { $ne: id }, email: email })
+    .then((user) => {
+      console.log(user);
+      if(user.length > 0) return res.json({status: "duplicated"})
+    })
+    .catch((err) => {
+      console.log(err);
+      next()
+    });
+  }
   //update user
   formEdit(req, res, next) {
     const userId = req.userId;
