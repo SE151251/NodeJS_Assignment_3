@@ -5,14 +5,25 @@ const jwt = require("jsonwebtoken");
 
 class OrchidController {
   home(req, res, next) {
+    var regex = null;
+    var query = null;
+    if (req.query.name) {
+      
+      regex = new RegExp(req.query.name, "i");
+      query = {
+        name: { $regex: regex },            
+      };
+      console.log("zo", query);
+    }
     if (req.cookies.jwt) {
+      console.log("zo");
       jwt.verify(req.cookies.jwt, "my_secret_key", (err, decoded) => {
         if (err) {
           req.name = undefined;
           req.role = undefined;
           Categories.find({})
             .then((categories) => {
-              Orchids.find()
+              Orchids.find(query)
                 .populate("category", ["categoryName"])
                 .then((orchids) => {
                   res.render("index", {
@@ -35,9 +46,10 @@ class OrchidController {
           req.userId = decoded.user.userId;
           req.name = decoded.user.name;
           req.role = decoded.user.role;
+          console.log(decoded.user.role);
           Categories.find({})
             .then((categories) => {
-              Orchids.find()
+              Orchids.find(query)
                 .populate("category", ["categoryName"])
                 .then((orchids) => {
                   res.render("index", {
@@ -61,8 +73,8 @@ class OrchidController {
     } else {
         Categories.find({})
         .then((categories) => {
-          Orchids.find({ isCaptain: true })
-            .populate("nation", ["name", "description"])
+          Orchids.find(query)
+            .populate("category", ["categoryName"])
             .then((orchids) => {
               res.render("index", {
                 title: "List of Orchids",
@@ -99,8 +111,7 @@ class OrchidController {
         const query = { category: filter_nation };                  
         Orchids.find(query)
           .countDocuments()
-          .then((count) => {
-           
+          .then((count) => {           
             totalItems = count;
             totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE); // Tính tổng số trang
             return Orchids.find(query)
@@ -170,8 +181,7 @@ class OrchidController {
         };
       }else{
         query = {
-            name: { $regex: regex },       
-           
+            name: { $regex: regex },                 
           };
       } 
       Orchids.find(query)
@@ -265,6 +275,65 @@ class OrchidController {
         return res.redirect("/orchids");
       });
   }
+  postComment(req, res, next) {
+    const orchidId = req.params.orchidId;
+    console.log(orchidId);
+          // Thêm comment mới
+          var check = false
+          Orchids.findById(orchidId)         
+            .then((orchid) => {            
+              if(orchid.comments.length > 0){
+                for(var i = 0; i < orchid.comments.length; i++) {
+                  if(req.userId === orchid.comments[i].author.toString()){               
+                    check = true
+                    req.flash("error_msg", "You had already posted comment for this Orchid!");
+                    res.redirect(`/orchids/${req.params.orchidId}`);                
+                    return
+                   }
+                } 
+              }
+             
+              console.log("tới 1");
+              if(!check){
+                const newComment = {
+                  rating: req.body.rating,
+                  comment: req.body.comment,
+                  author: req.userId, // Thay author_id_here bằng _id của người viết comment
+                };
+                console.log(newComment);
+                // Sử dụng findOneAndUpdate để thêm comment vào orchid
+                Orchids.findOneAndUpdate(
+                  { _id: orchidId },
+                  { $push: { comments: newComment } },
+                  { new: true }, // Trả về document mới sau khi cập nhật
+                  (err) => {
+                    if (err) {
+                      console.error("Error updating orchid:", err);
+                      req.flash("error_msg", "Post comment failed!");
+                      res.redirect(`/orchids/${req.params.orchidId}`);
+                      
+                    } else {
+                      req.flash("success_msg", "Post comment successfully!");
+                      res.redirect(`/orchids/${req.params.orchidId}`);
+                      
+                    }
+                  }
+                );
+              }
+              
+                       
+            })
+            .catch((err)=>{
+              console.log(err);
+              next()
+            });
+
+   
+       // }
+      // });       
+  }
+      
+    
   orchidDetail(req, res, next) {
     const orchidId = req.params.orchidId;
     if (req.cookies.jwt) {
@@ -275,8 +344,15 @@ class OrchidController {
           Categories.find({})
             .then((categories) => {
               Orchids.findById(orchidId)
+              .populate({
+                path: "comments",
+                populate: {
+                  path: "author",
+                  model: "users", // Đặt tên collection của model User
+                },
+              })
                 .populate("category", "categoryName")
-                .then((orchid) => {
+                .then((orchid) => {             
                   res.render("orchidDetail", {
                     title: "Detail of Orchid",
                     orchid: orchid,                 
@@ -294,8 +370,15 @@ class OrchidController {
           Categories.find({})
             .then((categories) => {
               Orchids.findById(orchidId)
+              .populate({
+                path: "comments",
+                populate: {
+                  path: "author",
+                  model: "users", // Đặt tên collection của model User
+                },
+              })
                 .populate("category", "categoryName")
-                .then((orchid) => {
+                .then((orchid) => {                
                   res.render("orchidDetail", {
                     title: "Detail of Orchid",
                     orchid: orchid,                  
@@ -312,8 +395,15 @@ class OrchidController {
       Categories.find({})
         .then((categories) => {
           Orchids.findById(orchidId)
+          .populate({
+            path: "comments",
+            populate: {
+              path: "author",
+              model: "users", // Đặt tên collection của model User
+            },
+          })
             .populate("category", "categoryName")
-            .then((orchid) => {
+            .then((orchid) => {        
               res.render("orchidDetail", {
                 title: "Detail of Orchid",
                 orchid: orchid,             

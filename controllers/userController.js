@@ -55,7 +55,7 @@ class userController {
             password,
           });
         } else {      
-          const email_temp = "user@gmail.com" 
+          const email_temp = `${username}@gmail.com`
           const newUser = new User({
             username,
             password,

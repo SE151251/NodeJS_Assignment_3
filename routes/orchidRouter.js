@@ -6,7 +6,7 @@ const {ensureAuthenticated,jwtAuth} = require('../config/auth')
 const {requireRole} = require('../config/verifyRole')
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/images/Players/");
+    cb(null, "public/images/Orchids/");
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -30,6 +30,8 @@ orchidRouter
   .route("/edit/:orchidId")
   .get(jwtAuth,requireRole, OrchidController.formEdit)
   .post(jwtAuth,requireRole, upload.single("file"), OrchidController.edit);
-orchidRouter.route("/:orchidId").get(OrchidController.orchidDetail);
+orchidRouter.route("/:orchidId")
+.get(OrchidController.orchidDetail)
+.post(jwtAuth,OrchidController.postComment);
 orchidRouter.route("/delete/:orchidId").get(jwtAuth,requireRole,OrchidController.delete);
 module.exports = orchidRouter;
