@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const userController = require('../controllers/userController')
 const playersController = require('../controllers/playerController');
+const orchidsController = require('../controllers/orchidController');
 const userRouter = express.Router();
  const {ensureAuthenticated, jwtAuth} = require('../config/auth')
 // const {redirectLogin} = require('../config/redirectLogin')
@@ -21,7 +22,7 @@ userRouter.route('/login')
  userRouter.route('/logout')
  .get(userController.logout)
  userRouter.route('/dashboard')
-  .get(jwtAuth,playersController.dashboard)
+  .get(jwtAuth,orchidsController.dashboard)
   userRouter.route('/edit')
   .get(jwtAuth,userController.formEdit)
   .post(jwtAuth,userController.edit)

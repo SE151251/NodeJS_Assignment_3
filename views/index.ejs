@@ -19,27 +19,29 @@
               <% } %>
     </div>
     <form style="width: 30vw" method="GET">
+      <div style="display: flex; align-items: center; justify-content: center; width: 100vw">
       <div class="field">        
         <div class="control has-icons-left">               
-          <input class="input" name="name" type="text" placeholder="Search by orchid name....">
+          <input class="input" name="name" style="width: 400px;" type="text" placeholder="Search by orchid name....">
           <span class="icon is-small is-left">
-            <i class="fas fa-envelope"></i>
+            <i class="fas fa-search"></i>
           </span>
         </div>
       </div>
       <div class="field is-grouped">
         <div class="control">
-          <button class="button is-primary" style="width:7vw">Search</button>
+          <button class="button is-primary" style="width:80px; margin-bottom: 10px; margin-left: 10px;">Search</button>
         </div>
       </div>
+    </div>
       </form>
 
-    <div class="columns is-multiline" style="margin-top: 120px; margin-left: 20px; margin-right: 20px;">
+    <div class="columns is-multiline" style="margin-top: 10px; margin-left: 20px; margin-right: 20px;">
       <% orchids.forEach(function(orchid) { %>
         <div class="column is-one-quarter">
           <div class="card">
             <div class="card-image">
-              <figure class="image is-3by5">
+              <figure class="image is-square">
                 <img src="<%= orchid.image %>" alt="Placeholder image">
               </figure>
             </div>

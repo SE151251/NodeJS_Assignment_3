@@ -12,11 +12,9 @@ class OrchidController {
       regex = new RegExp(req.query.name, "i");
       query = {
         name: { $regex: regex },            
-      };
-      console.log("zo", query);
+      };    
     }
     if (req.cookies.jwt) {
-      console.log("zo");
       jwt.verify(req.cookies.jwt, "my_secret_key", (err, decoded) => {
         if (err) {
           req.name = undefined;
@@ -46,7 +44,6 @@ class OrchidController {
           req.userId = decoded.user.userId;
           req.name = decoded.user.name;
           req.role = decoded.user.role;
-          console.log(decoded.user.role);
           Categories.find({})
             .then((categories) => {
               Orchids.find(query)
@@ -221,7 +218,7 @@ class OrchidController {
       Categories.countDocuments({}),
       Users.countDocuments({}),
     ])
-      .then(([totalOrchids, totalCategories, totalUsers]) => {
+      .then(([totalOrchids, totalCategories, totalUsers]) => {      
         res.render("dashboard", {
           title: "Dashboard",
           totalOrchids: totalOrchids,
@@ -231,7 +228,7 @@ class OrchidController {
         });
       })
       .catch((err) => {
-        console.error(err);
+        console.log(err);
         next();
       });
   }
@@ -277,7 +274,6 @@ class OrchidController {
   }
   postComment(req, res, next) {
     const orchidId = req.params.orchidId;
-    console.log(orchidId);
           // Thêm comment mới
           var check = false
           Orchids.findById(orchidId)         
@@ -291,16 +287,13 @@ class OrchidController {
                     return
                    }
                 } 
-              }
-             
-              console.log("tới 1");
+              }        
               if(!check){
                 const newComment = {
                   rating: req.body.rating,
                   comment: req.body.comment,
                   author: req.userId, // Thay author_id_here bằng _id của người viết comment
                 };
-                console.log(newComment);
                 // Sử dụng findOneAndUpdate để thêm comment vào orchid
                 Orchids.findOneAndUpdate(
                   { _id: orchidId },
@@ -352,12 +345,21 @@ class OrchidController {
                 },
               })
                 .populate("category", "categoryName")
-                .then((orchid) => {             
+                .then((orchid) => { 
+                  let count = 0, total = 0;
+                  if(orchid.comments.length > 0){              
+                    for(let i = 0; i < orchid.comments.length; i++) {
+                         count = count + 1;
+                         total = total + orchid.comments[i].rating
+                    } 
+                  }                    
                   res.render("orchidDetail", {
                     title: "Detail of Orchid",
                     orchid: orchid,                 
                     categoriesList: categories,
                     isLogin: { name: req.name, role: req.role },
+                    rating: (total>0 && count > 0) ? total/count : 0,
+                    totalTimeRating: count
                   });
                 })
                 .catch(next);
@@ -378,12 +380,21 @@ class OrchidController {
                 },
               })
                 .populate("category", "categoryName")
-                .then((orchid) => {                
+                .then((orchid) => {   
+                  let count = 0, total = 0;
+                  if(orchid.comments.length > 0){              
+                    for(let i = 0; i < orchid.comments.length; i++) {
+                         count = count + 1;
+                         total = total + orchid.comments[i].rating
+                    } 
+                  }                     
                   res.render("orchidDetail", {
                     title: "Detail of Orchid",
                     orchid: orchid,                  
                     categoriesList: categories,
                     isLogin: { name: req.name, role: req.role },
+                    rating: (total>0 && count > 0) ? total/count : 0,
+                    totalTimeRating: count
                   });
                 })
                 .catch(next);
@@ -403,12 +414,21 @@ class OrchidController {
             },
           })
             .populate("category", "categoryName")
-            .then((orchid) => {        
+            .then((orchid) => {           
+              let count = 0, total = 0;
+              if(orchid.comments.length > 0){              
+                for(let i = 0; i < orchid.comments.length; i++) {
+                     count = count + 1;
+                     total = total + orchid.comments[i].rating
+                } 
+              }                           
               res.render("orchidDetail", {
                 title: "Detail of Orchid",
                 orchid: orchid,             
                 categoriesList: categories,
                 isLogin: { name: req.name, role: req.role },
+                rating: (total>0 && count > 0) ? total/count : 0,
+                totalTimeRating: count
               });
             })
             .catch(next);
